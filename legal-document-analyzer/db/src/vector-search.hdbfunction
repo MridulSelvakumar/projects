@@ -1,0 +1,35 @@
+FUNCTION "VECTOR_SIMILARITY_SEARCH"(
+    IN search_embedding VARBINARY(5000),
+    IN similarity_threshold DECIMAL(3,2) DEFAULT 0.7,
+    IN max_results INTEGER DEFAULT 10
+)
+RETURNS TABLE (
+    clause_id NVARCHAR(36),
+    document_id NVARCHAR(36),
+    clause_type NVARCHAR(100),
+    content NCLOB,
+    similarity_score DECIMAL(5,4)
+)
+LANGUAGE SQLSCRIPT
+SQL SECURITY INVOKER
+AS
+BEGIN
+    -- Vector similarity search for legal clauses
+    -- This is a simplified implementation - in production, use HANA's native vector functions
+    
+    RETURN SELECT 
+        c.ID as clause_id,
+        c.document_ID as document_id,
+        c.clauseType as clause_type,
+        c.content,
+        -- Simplified similarity calculation (replace with actual vector similarity)
+        CASE 
+            WHEN LENGTH(c.content) > 0 THEN 0.8
+            ELSE 0.0
+        END as similarity_score
+    FROM "LEGAL_DOCUMENT_ANALYZER_CLAUSES" c
+    INNER JOIN "LEGAL_DOCUMENT_ANALYZER_CLAUSEEMBEDDINGS" ce ON c.ID = ce.clause_ID
+    WHERE ce.embedding IS NOT NULL
+    ORDER BY similarity_score DESC
+    LIMIT :max_results;
+END;

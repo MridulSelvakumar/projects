@@ -1,0 +1,52 @@
+---
+applications:
+  # CAP Backend Service
+  - name: legal-document-analyzer-srv
+    path: .
+    buildpacks:
+      - nodejs_buildpack
+    memory: 512M
+    disk_quota: 1G
+    instances: 1
+    command: npm start
+    env:
+      NODE_ENV: production
+      CDS_FEATURES_FETCH_CSRF: true
+    services:
+      - legal-document-analyzer-hana
+      - legal-document-analyzer-destination
+      - legal-document-analyzer-connectivity
+      - legal-document-analyzer-xsuaa
+    routes:
+      - route: legal-document-analyzer-srv.cfapps.sap.hana.ondemand.com
+
+  # AI Python Microservice  
+  - name: legal-document-analyzer-ai
+    path: ./ai-service
+    buildpacks:
+      - python_buildpack
+    memory: 1G
+    disk_quota: 2G
+    instances: 1
+    command: python app.py
+    env:
+      FLASK_ENV: production
+      PYTHONPATH: /home/vcap/app
+    routes:
+      - route: legal-document-analyzer-ai.cfapps.sap.hana.ondemand.com
+
+  # Fiori Frontend App
+  - name: legal-document-analyzer-ui
+    path: ./app/legal-document-ui
+    buildpacks:
+      - staticfile_buildpack
+    memory: 64M
+    disk_quota: 256M
+    instances: 1
+    env:
+      FORCE_HTTPS: true
+    services:
+      - legal-document-analyzer-destination
+      - legal-document-analyzer-xsuaa
+    routes:
+      - route: legal-document-analyzer-ui.cfapps.sap.hana.ondemand.com

@@ -1,0 +1,51 @@
+PROCEDURE "PROCESS_DOCUMENT_ANALYTICS"(
+    IN document_id NVARCHAR(36),
+    OUT processing_summary NVARCHAR(5000)
+)
+LANGUAGE SQLSCRIPT
+SQL SECURITY INVOKER
+AS
+BEGIN
+    DECLARE clause_count INTEGER;
+    DECLARE party_count INTEGER;
+    DECLARE embedding_count INTEGER;
+    DECLARE query_count INTEGER;
+    DECLARE risk_level NVARCHAR(20);
+    
+    -- Count clauses
+    SELECT COUNT(*) INTO clause_count
+    FROM "LEGAL_DOCUMENT_ANALYZER_CLAUSES"
+    WHERE document_ID = :document_id;
+    
+    -- Count parties
+    SELECT COUNT(*) INTO party_count
+    FROM "LEGAL_DOCUMENT_ANALYZER_PARTIES"
+    WHERE document_ID = :document_id;
+    
+    -- Count embeddings
+    SELECT COUNT(*) INTO embedding_count
+    FROM "LEGAL_DOCUMENT_ANALYZER_DOCUMENTEMBEDDINGS"
+    WHERE document_ID = :document_id;
+    
+    -- Count queries
+    SELECT COUNT(*) INTO query_count
+    FROM "LEGAL_DOCUMENT_ANALYZER_DOCUMENTQUERIES"
+    WHERE document_ID = :document_id;
+    
+    -- Determine risk level based on clause types
+    SELECT CASE 
+        WHEN COUNT(CASE WHEN clauseType = 'liability' THEN 1 END) = 0 THEN 'HIGH'
+        WHEN COUNT(CASE WHEN clauseType = 'termination' THEN 1 END) = 0 THEN 'MEDIUM'
+        ELSE 'LOW'
+    END INTO risk_level
+    FROM "LEGAL_DOCUMENT_ANALYZER_CLAUSES"
+    WHERE document_ID = :document_id;
+    
+    -- Build summary
+    processing_summary := 'Document Analysis Summary: ' ||
+                         'Clauses: ' || :clause_count || ', ' ||
+                         'Parties: ' || :party_count || ', ' ||
+                         'Embeddings: ' || :embedding_count || ', ' ||
+                         'Queries: ' || :query_count || ', ' ||
+                         'Risk Level: ' || :risk_level;
+END;

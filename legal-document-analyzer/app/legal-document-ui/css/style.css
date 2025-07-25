@@ -1,0 +1,161 @@
+/* Chat Interface Styling */
+.chatContainer {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #fafafa;
+}
+
+.chatMessage {
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    max-width: 80%;
+}
+
+.userMessage {
+    background-color: #0070f3;
+    color: white;
+    margin-left: auto;
+    margin-right: 0;
+    text-align: right;
+}
+
+.assistantMessage {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    margin-left: 0;
+    margin-right: auto;
+}
+
+.messageText {
+    word-wrap: break-word;
+    line-height: 1.4;
+}
+
+.userMessage .messageText {
+    color: white;
+}
+
+.assistantMessage .messageText {
+    color: #333;
+}
+
+/* Document Upload Styling */
+.sapMUploadSet {
+    border: 2px dashed #d9d9d9;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    transition: border-color 0.3s ease;
+}
+
+.sapMUploadSet:hover {
+    border-color: #0070f3;
+}
+
+/* Document Table Styling */
+.sapMListTbl .sapMListTblRow:hover {
+    background-color: #f5f5f5;
+}
+
+/* Panel Styling */
+.sapMPanel .sapMPanelHdr {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+/* Quick Questions Styling */
+.sapMBtn.sapMBtnTransparent {
+    border: 1px solid #e0e0e0;
+    border-radius: 16px;
+    padding: 4px 12px;
+    margin: 2px;
+    background-color: #f8f9fa;
+    transition: all 0.2s ease;
+}
+
+.sapMBtn.sapMBtnTransparent:hover {
+    background-color: #e9ecef;
+    border-color: #0070f3;
+}
+
+/* Status Indicators */
+.sapMObjectStatus.sapMObjectStatusSuccess {
+    color: #28a745;
+}
+
+.sapMObjectStatus.sapMObjectStatusWarning {
+    color: #ffc107;
+}
+
+.sapMObjectStatus.sapMObjectStatusError {
+    color: #dc3545;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .chatMessage {
+        max-width: 95%;
+    }
+    
+    .sapMUploadSet {
+        padding: 10px;
+    }
+}
+
+/* Loading Animation */
+.typingIndicator {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #0070f3;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Document Type Badges */
+.documentTypeBadge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.documentTypeBadge.contract {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.documentTypeBadge.nda {
+    background-color: #fff3e0;
+    color: #f57c00;
+}
+
+.documentTypeBadge.agreement {
+    background-color: #e8f5e8;
+    color: #388e3c;
+}
+
+.documentTypeBadge.policy {
+    background-color: #fce4ec;
+    color: #c2185b;
+}
+
+/* Accessibility Improvements */
+.chatMessage:focus {
+    outline: 2px solid #0070f3;
+    outline-offset: 2px;
+}
+
+.sapMBtn:focus {
+    outline: 2px solid #0070f3;
+    outline-offset: 2px;
+}

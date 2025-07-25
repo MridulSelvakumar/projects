@@ -1,0 +1,44 @@
+{
+  "name": "legal-document-analyzer",
+  "version": "1.0.0",
+  "description": "AI-Powered Legal Document Analyzer using SAP BTP, CAPM, HANA Cloud, and GenAI",
+  "repository": "https://github.com/MridulSelvakumar/projects.git",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@sap/cds": "^9",
+    "express": "^4",
+    "@cap-js/hana": "^2",
+    "multer": "^1.4.5-lts.1",
+    "axios": "^1.6.0",
+    "pdf-parse": "^1.1.1",
+    "mammoth": "^1.6.0",
+    "uuid": "^9.0.1"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^2",
+    "@cap-js/cds-types": "^0.13.0"
+  },
+  "scripts": {
+    "start": "cds-serve",
+    "watch": "cds watch",
+    "build": "cds build",
+    "deploy": "cds deploy"
+  },
+  "cds": {
+    "requires": {
+      "db": {
+        "kind": "hana-cloud"
+      },
+      "ai-service": {
+        "kind": "rest",
+        "credentials": {
+          "url": "http://localhost:5000"
+        }
+      }
+    }
+  }
+}
