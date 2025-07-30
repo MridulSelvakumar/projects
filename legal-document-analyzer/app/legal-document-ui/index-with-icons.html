@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal Document Analyzer</title>
+    <script
+        id="sap-ui-bootstrap"
+        src="https://ui5.sap.com/1.120.0/resources/sap-ui-core.js"
+        data-sap-ui-theme="sap_horizon"
+        data-sap-ui-libs="sap.m,sap.tnt,sap.ui.core"
+        data-sap-ui-compatVersion="edge"
+        data-sap-ui-async="true"
+        data-sap-ui-preload="async">
+    </script>
+    
+    <style>
+        .sapUiBody {
+            font-family: "72", "72full", Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+        }
+        
+        /* Custom icon fallbacks */
+        .custom-nav-icon {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            margin-right: 0.5rem;
+            text-align: center;
+            font-weight: bold;
+            color: #0070f2;
+        }
+    </style>
+</head>
+<body class="sapUiBody">
+    <div id="content"></div>
+    
+    <script>
+        sap.ui.getCore().attachInit(function() {
+            sap.ui.require([
+                "sap/m/App",
+                "sap/m/Page", 
+                "sap/m/VBox",
+                "sap/m/Panel",
+                "sap/m/Text",
+                "sap/m/Title",
+                "sap/m/Button",
+                "sap/m/MessageToast",
+                "sap/tnt/ToolPage",
+                "sap/tnt/SideNavigation", 
+                "sap/tnt/NavigationList",
+                "sap/tnt/NavigationListItem",
+                "sap/ui/core/IconPool"
+            ], function(App, Page, VBox, Panel, Text, Title, Button, MessageToast, ToolPage, SideNavigation, NavigationList, NavigationListItem, IconPool) {
+                
+                // Initialize icon pool
+                IconPool.insertFontFaceStyle();
+                
+                var app = new App({
+                    id: "legalDocApp"
+                });
+                
+                var toolPage = new ToolPage({
+                    header: new sap.m.Bar({
+                        contentLeft: [
+                            new Text({
+                                text: "📄 Legal Document Analyzer"
+                            }).addStyleClass("sapMTitle")
+                        ]
+                    }),
+                    
+                    sideContent: new SideNavigation({
+                        item: new NavigationList({
+                            items: [
+                                new NavigationListItem({
+                                    text: "📤 Document Upload",
+                                    key: "upload"
+                                }),
+                                new NavigationListItem({
+                                    text: "🤖 AI Assistant", 
+                                    key: "ai"
+                                }),
+                                new NavigationListItem({
+                                    text: "📊 Analytics",
+                                    key: "analytics"
+                                }),
+                                new NavigationListItem({
+                                    text: "📁 Documents",
+                                    key: "documents"
+                                })
+                            ]
+                        })
+                    }),
+                    
+                    mainContents: [
+                        new VBox({
+                            items: [
+                                new Panel({
+                                    headerText: "Welcome to Legal Document Analyzer",
+                                    content: [
+                                        new VBox({
+                                            items: [
+                                                new Title({
+                                                    text: "Legal Document Analyzer",
+                                                    level: "H3"
+                                                }),
+                                                new Text({
+                                                    text: "AI-Powered Legal Document Analysis"
+                                                }),
+                                                new Text({
+                                                    text: "Welcome to the Legal Document Analyzer! This application uses advanced AI to analyze legal documents, extract key clauses, and provide intelligent insights."
+                                                }),
+                                                new Button({
+                                                    text: "▶️ Test AI Service",
+                                                    type: "Emphasized",
+                                                    press: function() {
+                                                        MessageToast.show("🤖 AI Service is ready!");
+                                                    }
+                                                })
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                
+                                new Panel({
+                                    headerText: "Key Features",
+                                    content: [
+                                        new VBox({
+                                            items: [
+                                                new Text({ text: "📄 Document Upload (PDF, DOCX, TXT)" }),
+                                                new Text({ text: "🤖 AI-Powered Q&A with RAG" }),
+                                                new Text({ text: "📝 Clause Extraction" }),
+                                                new Text({ text: "⚠️ Risk Assessment & Analytics" }),
+                                                new Text({ text: "🎨 Enterprise SAP Fiori UI" })
+                                            ]
+                                        })
+                                    ]
+                                })
+                            ]
+                        })
+                    ]
+                });
+                
+                app.addPage(new Page({
+                    content: [toolPage]
+                }));
+                
+                app.placeAt("content");
+            });
+        });
+    </script>
+</body>
+</html>

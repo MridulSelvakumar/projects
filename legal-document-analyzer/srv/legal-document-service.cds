@@ -1,23 +1,19 @@
 using { legal.document.analyzer as lda } from '../db/schema';
+using { legal.document.analyzer as ldaViews } from '../db/views';
 
 // Main service for legal document analysis
 service LegalDocumentService @(path: '/legal-documents') {
 
   // Document management
+  @cds.redirection.target
   entity Documents as projection on lda.Documents actions {
-    action uploadDocument(
-      @Core.MediaType: file.mimeType
-      file: LargeBinary,
-      fileName: String,
-      documentType: String
-    ) returns Documents;
-    
     action processDocument() returns String;
     action reprocessDocument() returns String;
     action deleteDocument() returns String;
   };
 
   // Clause management with enhanced search
+  @cds.redirection.target
   entity Clauses as projection on lda.Clauses {
     *,
     document.title as documentTitle,
@@ -36,24 +32,44 @@ service LegalDocumentService @(path: '/legal-documents') {
   };
 
   // Query interface for AI interactions
-  entity DocumentQueries as projection on lda.DocumentQueries actions {
-    action askQuestion(
-      documentId: UUID,
-      question: String,
-      queryType: String
-    ) returns DocumentQueries;
-    
-    action provideFeedback(
-      feedback: String
-    ) returns String;
+  @cds.redirection.target
+  entity DocumentQueries as projection on lda.DocumentQueries;
+
+  // Unbound actions for the service
+  action askQuestion(
+    documentId: UUID,
+    question: String,
+    queryType: String
+  ) returns {
+    response: String;
+    confidence: Decimal(3,2);
+    queryId: UUID;
+  };
+
+  action provideFeedback(
+    feedback: String
+  ) returns String;
+
+  action uploadDocument(
+    file: LargeBinary,
+    fileName: String,
+    documentType: String,
+    sessionToken: String
+  ) returns {
+    success: Boolean;
+    documentId: UUID;
+    message: String;
   };
 
   // Analytics and reporting views
-  @readonly entity DocumentSummary as projection on lda.DocumentSummaryView;
-  @readonly entity ClauseAnalytics as projection on lda.ClauseAnalyticsView;
-  @readonly entity ProcessingStatus as projection on lda.ProcessingStatusView;
-  @readonly entity QueryPerformance as projection on lda.QueryPerformanceView;
-  @readonly entity RecentActivity as projection on lda.RecentActivityView;
+  @readonly entity DocumentSummary as projection on ldaViews.DocumentSummaryView;
+  @readonly entity DocumentStatistics as projection on ldaViews.DocumentStatisticsView;
+  @readonly entity ClauseAnalytics as projection on ldaViews.ClauseAnalyticsView;
+  @readonly entity ClauseTypeDistribution as projection on ldaViews.ClauseTypeDistributionView;
+  @readonly entity ProcessingStatus as projection on ldaViews.ProcessingStatusView;
+  @readonly entity QueryPerformance as projection on ldaViews.QueryPerformanceView;
+  @readonly entity RecentActivity as projection on ldaViews.RecentActivityView;
+  @readonly entity ProcessingTimeline as projection on ldaViews.DocumentProcessingTimelineView;
 
   // Configuration management
   entity AIConfiguration as projection on lda.AIConfiguration;

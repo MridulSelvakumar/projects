@@ -1,3 +1,111 @@
+/* SAP Fiori Shell Styling */
+.sapTntToolPage .sapTntToolHeader {
+    background-color: #0070f3;
+    border-bottom: 1px solid #005cc8;
+}
+
+.sapTntToolPage .sapTntToolHeader .sapMTitle {
+    color: white;
+    font-weight: 600;
+}
+
+.sapTntToolPage .sapTntToolHeader .sapMBtn {
+    color: white;
+}
+
+.sapTntSideNavigation {
+    background-color: #f7f7f7;
+    border-right: 1px solid #e0e0e0;
+}
+
+.sapTntNavLI {
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.sapTntNavLI:hover {
+    background-color: #e8f4fd;
+}
+
+.sapTntNavLI.sapTntNavLISelected {
+    background-color: #0070f3;
+    color: white;
+}
+
+/* Clean Interface Styling */
+.sapMPage {
+    background-color: #f8f9fa;
+}
+
+/* Panel Styling */
+.sapMPanel {
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.sapMPanel .sapMPanelHdr {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e9ecef;
+    font-weight: 600;
+    color: #495057;
+}
+
+.sapMPanel .sapMPanelContent {
+    background-color: #ffffff;
+    padding: 1rem;
+}
+
+/* Upload Section */
+#uploadPanel .sapMPanelHdr {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+/* Analysis Section */
+#analysisPanel .sapMPanelHdr {
+    background-color: #f3e5f5;
+    color: #7b1fa2;
+}
+
+/* Q&A Section */
+#qaPanel .sapMPanelHdr {
+    background-color: #e8f5e8;
+    color: #388e3c;
+}
+
+/* Button Styling */
+.sapMBtn.sapMBtnEmphasized {
+    background-color: #1976d2;
+    border-color: #1976d2;
+}
+
+.sapMBtn.sapMBtnEmphasized:hover {
+    background-color: #1565c0;
+    border-color: #1565c0;
+}
+
+/* Form Controls */
+.sapMSelect, .sapMTextArea {
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
+.sapMSelect:focus, .sapMTextArea:focus {
+    border-color: #1976d2;
+    box-shadow: 0 0 0 0.2rem rgba(25, 118, 210, 0.25);
+}
+
+/* Links */
+.sapMLnk {
+    color: #1976d2;
+    text-decoration: none;
+}
+
+.sapMLnk:hover {
+    color: #1565c0;
+    text-decoration: underline;
+}
+
 /* Chat Interface Styling */
 .chatContainer {
     border: 1px solid #e0e0e0;

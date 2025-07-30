@@ -1,0 +1,127 @@
+{
+  "xsappname": "legal-document-analyzer",
+  "tenant-mode": "dedicated",
+  "description": "Security configuration for Legal Document Analyzer",
+  "scopes": [
+    {
+      "name": "$XSAPPNAME.Admin",
+      "description": "Administrator access to legal document analyzer"
+    },
+    {
+      "name": "$XSAPPNAME.User",
+      "description": "User access to legal document analyzer"
+    },
+    {
+      "name": "$XSAPPNAME.DocumentUpload",
+      "description": "Permission to upload documents"
+    },
+    {
+      "name": "$XSAPPNAME.DocumentView",
+      "description": "Permission to view documents"
+    },
+    {
+      "name": "$XSAPPNAME.DocumentAnalyze",
+      "description": "Permission to analyze documents with AI"
+    },
+    {
+      "name": "$XSAPPNAME.Analytics",
+      "description": "Permission to view analytics and reports"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "Department",
+      "description": "User department",
+      "valueType": "string"
+    },
+    {
+      "name": "Region",
+      "description": "User region",
+      "valueType": "string"
+    }
+  ],
+  "role-templates": [
+    {
+      "name": "Admin",
+      "description": "Administrator role with full access",
+      "scope-references": [
+        "$XSAPPNAME.Admin",
+        "$XSAPPNAME.User",
+        "$XSAPPNAME.DocumentUpload",
+        "$XSAPPNAME.DocumentView",
+        "$XSAPPNAME.DocumentAnalyze",
+        "$XSAPPNAME.Analytics"
+      ],
+      "attribute-references": [
+        "Department",
+        "Region"
+      ]
+    },
+    {
+      "name": "LegalAnalyst",
+      "description": "Legal analyst role with document analysis capabilities",
+      "scope-references": [
+        "$XSAPPNAME.User",
+        "$XSAPPNAME.DocumentUpload",
+        "$XSAPPNAME.DocumentView",
+        "$XSAPPNAME.DocumentAnalyze",
+        "$XSAPPNAME.Analytics"
+      ],
+      "attribute-references": [
+        "Department"
+      ]
+    },
+    {
+      "name": "Viewer",
+      "description": "Read-only access to documents and analytics",
+      "scope-references": [
+        "$XSAPPNAME.User",
+        "$XSAPPNAME.DocumentView",
+        "$XSAPPNAME.Analytics"
+      ]
+    },
+    {
+      "name": "Uploader",
+      "description": "Document upload and basic viewing capabilities",
+      "scope-references": [
+        "$XSAPPNAME.User",
+        "$XSAPPNAME.DocumentUpload",
+        "$XSAPPNAME.DocumentView"
+      ]
+    }
+  ],
+  "role-collections": [
+    {
+      "name": "LegalDocumentAnalyzer_Admin",
+      "description": "Administrator role collection",
+      "role-template-references": [
+        "$XSAPPNAME.Admin"
+      ]
+    },
+    {
+      "name": "LegalDocumentAnalyzer_Analyst",
+      "description": "Legal analyst role collection",
+      "role-template-references": [
+        "$XSAPPNAME.LegalAnalyst"
+      ]
+    },
+    {
+      "name": "LegalDocumentAnalyzer_User",
+      "description": "Standard user role collection",
+      "role-template-references": [
+        "$XSAPPNAME.Uploader"
+      ]
+    }
+  ],
+  "oauth2-configuration": {
+    "redirect-uris": [
+      "https://*.cfapps.sap.hana.ondemand.com/**",
+      "https://*.hana.ondemand.com/**",
+      "http://localhost:4004/**"
+    ],
+    "system-attributes": [
+      "groups",
+      "rolecollections"
+    ]
+  }
+}

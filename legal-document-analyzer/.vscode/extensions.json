@@ -5,7 +5,8 @@
 		"esbenp.prettier-vscode",
 		"mechatroner.rainbow-csv",
 		"qwtel.sqlite-viewer",
-		"humao.rest-client"
+		"humao.rest-client",
+		"augment.vscode-augment"
 	],
 	"unwantedRecommendations": [
 

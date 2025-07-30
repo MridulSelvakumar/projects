@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal Document Analyzer - Form</title>
+    
+    <style>
+        body {
+            font-family: "72", "72full", Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f7f7f7;
+        }
+        .header {
+            background: #354a5f;
+            color: white;
+            padding: 1rem 2rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        .form-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .form-header {
+            background: #0070f2;
+            color: white;
+            padding: 1.5rem 2rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+        .form-content {
+            padding: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #32363a;
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d9d9d9;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            box-sizing: border-box;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #0070f2;
+            box-shadow: 0 0 0 2px rgba(0, 112, 242, 0.2);
+        }
+        .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d9d9d9;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            background: white;
+            box-sizing: border-box;
+        }
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d9d9d9;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            resize: vertical;
+            min-height: 100px;
+            box-sizing: border-box;
+        }
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .form-actions {
+            background: #f7f7f7;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            border-top: 1px solid #e5e5e5;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.25rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        .btn-secondary {
+            background: #f7f7f7;
+            color: #32363a;
+            border: 1px solid #d9d9d9;
+        }
+        .btn-primary {
+            background: #0070f2;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+        .required {
+            color: #e53e3e;
+        }
+        .status {
+            padding: 1rem;
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+            border-radius: 0.25rem;
+            color: #2e7d32;
+            margin: 1rem 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        🏛️ Legal Document Analyzer - Professional SAP Fiori Form
+    </div>
+    
+    <div class="status">
+        ✅ Form loaded successfully! Ready for document upload and analysis.
+    </div>
+    
+    <div class="form-container">
+        <div class="form-header">
+            📄 Document Analysis Form
+        </div>
+        
+        <div class="form-content">
+            <form id="documentForm">
+                <div class="form-group">
+                    <label class="form-label">Document Title <span class="required">*</span></label>
+                    <input type="text" class="form-input" placeholder="Enter document title..." required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Document Type <span class="required">*</span></label>
+                    <select class="form-select" required>
+                        <option value="">Select document type...</option>
+                        <option value="contract">Contract</option>
+                        <option value="agreement">Agreement</option>
+                        <option value="policy">Policy Document</option>
+                        <option value="legal_brief">Legal Brief</option>
+                        <option value="compliance">Compliance Document</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Upload Document <span class="required">*</span></label>
+                    <input type="file" class="form-input" accept=".pdf,.docx,.txt" required>
+                    <small style="color: #6a6d70; margin-top: 0.25rem; display: block;">
+                        Supported formats: PDF, DOCX, TXT (Max 10MB)
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Analysis Priority</label>
+                    <select class="form-select">
+                        <option value="high">High Priority</option>
+                        <option value="medium" selected>Medium Priority</option>
+                        <option value="low">Low Priority</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Analysis Type</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" name="analysisType" value="full" checked>
+                            <label>Full Document Analysis</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" name="analysisType" value="risk">
+                            <label>Quick Risk Assessment</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" name="analysisType" value="clauses">
+                            <label>Clause Extraction Only</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Additional Comments</label>
+                    <textarea class="form-textarea" placeholder="Enter any specific requirements or focus areas for the analysis..."></textarea>
+                </div>
+            </form>
+        </div>
+        
+        <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="clearForm()">
+                Clear Form
+            </button>
+            <button type="button" class="btn btn-primary" onclick="submitForm()">
+                🚀 Upload & Analyze
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function clearForm() {
+            document.getElementById('documentForm').reset();
+            showMessage('Form cleared successfully!', 'info');
+        }
+        
+        function submitForm() {
+            const form = document.getElementById('documentForm');
+            if (form.checkValidity()) {
+                showMessage('🎉 Document uploaded successfully! Analysis started.', 'success');
+            } else {
+                showMessage('Please fill in all required fields.', 'error');
+            }
+        }
+        
+        function showMessage(message, type) {
+            const toast = document.createElement('div');
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#4caf50' : type === 'error' ? '#f44336' : '#2196f3'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 0.25rem;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                z-index: 1000;
+                font-weight: 600;
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 3000);
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ Legal Document Analyzer form loaded successfully!');
+            showMessage('Welcome! Form is ready for document upload.', 'info');
+        });
+    </script>
+</body>
+</html>

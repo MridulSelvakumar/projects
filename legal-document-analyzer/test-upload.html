@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Upload</title>
+</head>
+<body>
+    <h1>Test Document Upload</h1>
+    
+    <div>
+        <h2>1. Test Login</h2>
+        <button onclick="testLogin()">Test Login</button>
+        <div id="loginResult"></div>
+    </div>
+    
+    <div>
+        <h2>2. Test Upload</h2>
+        <input type="file" id="fileInput" accept=".txt,.pdf,.docx">
+        <button onclick="testUpload()">Test Upload</button>
+        <div id="uploadResult"></div>
+    </div>
+    
+    <div>
+        <h2>3. Test List Documents</h2>
+        <button onclick="testListDocuments()">List Documents</button>
+        <div id="documentsResult"></div>
+    </div>
+
+    <script>
+        let sessionToken = null;
+        let currentUser = null;
+
+        async function testLogin() {
+            try {
+                const response = await fetch('/user/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: 'demo',
+                        password: 'demo'
+                    })
+                });
+                
+                const data = await response.json();
+                document.getElementById('loginResult').innerHTML = 
+                    '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                
+                if (data.success) {
+                    sessionToken = data.sessionToken;
+                    currentUser = data.user;
+                    console.log('Login successful, token:', sessionToken);
+                }
+            } catch (error) {
+                document.getElementById('loginResult').innerHTML = 
+                    '<div style="color: red;">Error: ' + error.message + '</div>';
+            }
+        }
+
+        async function testUpload() {
+            if (!sessionToken) {
+                alert('Please login first');
+                return;
+            }
+
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a file');
+                return;
+            }
+
+            try {
+                // Convert file to base64
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    const base64Content = e.target.result.split(',')[1];
+                    
+                    const response = await fetch('/legal-documents/uploadDocument', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            file: base64Content,
+                            fileName: file.name,
+                            documentType: 'CONTRACT',
+                            sessionToken: sessionToken
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    document.getElementById('uploadResult').innerHTML = 
+                        '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                };
+                
+                reader.readAsDataURL(file);
+                
+            } catch (error) {
+                document.getElementById('uploadResult').innerHTML = 
+                    '<div style="color: red;">Error: ' + error.message + '</div>';
+            }
+        }
+
+        async function testListDocuments() {
+            try {
+                const response = await fetch('/legal-documents/Documents');
+                const data = await response.json();
+                document.getElementById('documentsResult').innerHTML = 
+                    '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('documentsResult').innerHTML = 
+                    '<div style="color: red;">Error: ' + error.message + '</div>';
+            }
+        }
+    </script>
+</body>
+</html>

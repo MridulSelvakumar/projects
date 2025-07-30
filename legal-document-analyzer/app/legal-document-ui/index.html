@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal Document Analyzer</title>
+    <script
+        id="sap-ui-bootstrap"
+        src="https://ui5.sap.com/1.120.0/resources/sap-ui-core.js"
+        data-sap-ui-theme="sap_horizon"
+        data-sap-ui-libs="sap.m,sap.tnt"
+        data-sap-ui-compatVersion="edge"
+        data-sap-ui-async="true">
+    </script>
+    
+    <style>
+        .sapUiBody {
+            font-family: "72", "72full", Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+        }
+
+        .dashboard-stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.5rem;
+            min-width: 180px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-feature-item {
+            border-left: 4px solid #0070f2;
+            padding-left: 1rem;
+            margin: 0.5rem 0;
+        }
+
+        .dashboard-status-success {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .dashboard-status-warning {
+            color: #ffc107;
+            font-weight: 600;
+        }
+
+        .dashboard-status-error {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        /* Chat message styling */
+        .userMessage {
+            justify-content: flex-end;
+        }
+
+        .userMessage .sapMText {
+            background-color: #0070f3;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 18px 18px 4px 18px;
+            max-width: 70%;
+        }
+
+        .assistantMessage .sapMText {
+            background-color: #f1f3f4;
+            color: #333;
+            padding: 8px 12px;
+            border-radius: 18px 18px 18px 4px;
+            max-width: 70%;
+        }
+    </style>
+</head>
+<body class="sapUiBody">
+    <div id="content"></div>
+    
+    <script>
+        sap.ui.getCore().attachInit(function() {
+            sap.ui.require([
+                "sap/m/App",
+                "sap/m/Page",
+                "sap/m/Text",
+                "sap/m/Title",
+                "sap/m/Button",
+                "sap/m/VBox",
+                "sap/m/Panel",
+                "sap/m/MessageToast",
+                "sap/m/Dialog",
+                "sap/m/List",
+                "sap/m/StandardListItem",
+                "sap/m/Input",
+                "sap/m/HBox",
+                "sap/m/ScrollContainer",
+                "sap/m/MessageStrip",
+                "sap/m/FormattedText",
+                "sap/tnt/ToolPage",
+                "sap/tnt/SideNavigation",
+                "sap/tnt/NavigationList",
+                "sap/tnt/NavigationListItem"
+            ], function(App, Page, Text, Title, Button, VBox, Panel, MessageToast, Dialog, List, StandardListItem, Input, HBox, ScrollContainer, MessageStrip, FormattedText, ToolPage, SideNavigation, NavigationList, NavigationListItem) {
+                
+                var app = new App({
+                    id: "legalDocApp"
+                });
+
+                // Global variables for user session
+                var currentUser = null;
+                var sessionToken = null;
+                var currentDocumentType = "CONTRACT"; // Global variable for document type
+                var currentDocumentsContainer = null; // Reference to current documents container
+                
+                var toolPage = new ToolPage({
+                    header: new sap.m.Bar({
+                        contentLeft: [
+                            new Text({
+                                text: "Legal Document Analyzer"
+                            }).addStyleClass("sapMTitle")
+                        ],
+                        contentRight: [
+                            new VBox({
+                                id: "userInfo",
+                                items: [
+                                    new Button({
+                                        id: "loginBtn",
+                                        text: "Login",
+                                        type: "Emphasized",
+                                        press: function() {
+                                            showLoginDialog();
+                                        }
+                                    })
+                                ]
+                            })
+                        ]
+                    }),
+                    
+                    sideContent: new SideNavigation({
+                        item: new NavigationList({
+                            items: [
+                                new NavigationListItem({
+                                    text: "Dashboard",
+                                    icon: "sap-icon://business-objects-experience",
+                                    key: "dashboard",
+                                    select: function() {
+                                        showContent("dashboard");
+                                    }
+                                }),
+                                new NavigationListItem({
+                                    text: "Document Upload",
+                                    icon: "sap-icon://upload",
+                                    key: "upload",
+                                    select: function() {
+                                        showContent("upload");
+                                    }
+                                }),
+                                new NavigationListItem({
+                                    text: "AI Assistant",
+                                    icon: "sap-icon://discussion-2",
+                                    key: "ai",
+                                    select: function() {
+                                        showContent("ai");
+                                    }
+                                }),
+                                new NavigationListItem({
+                                    text: "Analytics",
+                                    icon: "sap-icon://pie-chart",
+                                    key: "analytics",
+                                    select: function() {
+                                        showContent("analytics");
+                                    }
+                                }),
+                                new NavigationListItem({
+                                    text: "My Documents",
+                                    icon: "sap-icon://document",
+                                    key: "documents",
+                                    select: function() {
+                                        showContent("documents");
+                                    }
+                                })
+                            ]
+                        })
+                    }),
+                    
+                    mainContents: [
+                        new VBox({
+                            id: "mainContentArea",
+                            items: [
+                                createDashboardContent()
+                            ]
+                        })
+                    ]
+                });
+                
+                function createDashboardContent() {
+                    return new VBox({
+                        items: [
+                            // Welcome Section
+                            new Panel({
+                                headerText: "Legal Document Analyzer Dashboard",
+                                content: [
+                                    new VBox({
+                                        items: [
+                                            new Title({
+                                                text: currentUser ?
+                                                    "Welcome back, " + currentUser.firstName + "!" :
+                                                    "Welcome to Legal Document Analyzer",
+                                                level: "H3"
+                                            }),
+                                            new Text({
+                                                text: "AI-Powered Legal Document Analysis & Management Platform"
+                                            }),
+                                            new Text({
+                                                text: currentUser ?
+                                                    "Here's an overview of your document analysis activity and system status." :
+                                                    "Please login to access your personalized dashboard and start analyzing legal documents."
+                                            })
+                                        ]
+                                    })
+                                ]
+                            }),
+
+                            // Statistics Cards Row
+                            new Panel({
+                                headerText: "Quick Statistics",
+                                content: [
+                                    new sap.m.FlexBox({
+                                        direction: "Row",
+                                        wrap: "Wrap",
+                                        items: [
+                                            createStatCard("Documents Uploaded", (window.dashboardStats && window.dashboardStats[0]) ? window.dashboardStats[0].value : "0", "sap-icon://document", "sapUiMediumMargin"),
+                                            createStatCard("AI Analyses", (window.dashboardStats && window.dashboardStats[1]) ? window.dashboardStats[1].value : "0", "sap-icon://discussion-2", "sapUiMediumMargin"),
+                                            createStatCard("Questions Asked", (window.dashboardStats && window.dashboardStats[2]) ? window.dashboardStats[2].value : "0", "sap-icon://question-mark", "sapUiMediumMargin"),
+                                            createStatCard("Processing Time", "< 1 min", "sap-icon://time-entry-request", "sapUiMediumMargin")
+                                        ]
+                                    })
+                                ]
+                            }),
+
+                            // System Status
+                            new Panel({
+                                headerText: "System Status",
+                                content: [
+                                    new VBox({
+                                        items: [
+                                            createStatusItem("Gemini AI Service", "Connected", "Success"),
+                                            createStatusItem("Document Processing", "Active", "Success"),
+                                            createStatusItem("Database", "Online", "Success"),
+                                            createStatusItem("File Upload", "Ready", "Success")
+                                        ]
+                                    })
+                                ]
+                            }),
+
+                            // Key Features
+                            new Panel({
+                                headerText: "Platform Capabilities",
+                                content: [
+                                    new VBox({
+                                        items: [
+                                            createFeatureItem("📄 Document Upload", "Support for PDF, DOCX, and TXT files up to 10MB"),
+                                            createFeatureItem("🤖 AI Analysis", "Powered by Google Gemini for intelligent document processing"),
+                                            createFeatureItem("💬 Smart Q&A", "Ask questions about your documents with context-aware responses"),
+                                            createFeatureItem("📊 Analytics", "Document insights, clause extraction, and risk assessment"),
+                                            createFeatureItem("🔐 Secure Storage", "User-specific document management with session security"),
+                                            createFeatureItem("📱 Enterprise UI", "Professional SAP Fiori interface for business users")
+                                        ]
+                                    })
+                                ]
+                            }),
+
+                            // Quick Actions
+                            new Panel({
+                                headerText: "Quick Actions",
+                                content: [
+                                    new sap.m.FlexBox({
+                                        direction: "Row",
+                                        wrap: "Wrap",
+                                        items: [
+                                            new Button({
+                                                text: "Upload Document",
+                                                icon: "sap-icon://upload",
+                                                type: "Emphasized",
+                                                class: "sapUiMediumMargin",
+                                                press: function() {
+                                                    showContent("upload");
+                                                }
+                                            }),
+                                            new Button({
+                                                text: "Ask AI Assistant",
+                                                icon: "sap-icon://discussion-2",
+                                                type: "Default",
+                                                class: "sapUiMediumMargin",
+                                                press: function() {
+                                                    showContent("ai");
+                                                }
+                                            }),
+                                            new Button({
+                                                text: "View My Documents",
+                                                icon: "sap-icon://document",
+                                                type: "Default",
+                                                class: "sapUiMediumMargin",
+                                                press: function() {
+                                                    showContent("documents");
+                                                }
+                                            }),
+                                            new Button({
+                                                text: "View Analytics",
+                                                icon: "sap-icon://pie-chart",
+                                                type: "Default",
+                                                class: "sapUiMediumMargin",
+                                                press: function() {
+                                                    showContent("analytics");
+                                                }
+                                            })
+                                        ]
+                                    })
+                                ]
+                            })
+                        ]
+                    });
+                }
+
+                function createStatCard(title, value, icon, styleClass) {
+                    return new sap.m.GenericTile({
+                        class: styleClass,
+                        header: title,
+                        subheader: value,
+                        headerImage: icon,
+                        mode: "ContentMode",
+                        width: "200px",
+                        height: "120px"
+                    });
+                }
+
+                function createStatusItem(service, status, state) {
+                    var statusIcon = state === "Success" ? "✅" :
+                                   state === "Warning" ? "⚠️" : "❌";
+
+                    return new sap.m.FlexBox({
+                        direction: "Row",
+                        alignItems: "Center",
+                        class: "sapUiSmallMargin",
+                        items: [
+                            new Text({
+                                text: statusIcon + " " + service + ": " + status,
+                                class: "sapUiMediumMarginEnd"
+                            })
+                        ]
+                    });
+                }
+
+                function createFeatureItem(title, description) {
+                    return new VBox({
+                        class: "sapUiSmallMargin",
+                        items: [
+                            new Text({
+                                text: title,
+                                class: "sapUiMediumMarginBottom"
+                            }),
+                            new Text({
+                                text: description,
+                                class: "sapUiSmallMarginBottom"
+                            })
+                        ]
+                    });
+                }
+                
+                function showContent(section) {
+                    var mainArea = sap.ui.getCore().byId("mainContentArea");
+
+                    // Properly destroy existing content to avoid ID conflicts
+                    var existingItems = mainArea.getItems();
+                    for (var i = 0; i < existingItems.length; i++) {
+                        existingItems[i].destroy();
+                    }
+                    mainArea.removeAllItems();
+
+                    var content;
+                    switch(section) {
+                        case "dashboard":
+                            content = createDashboardContent();
+                            // Load dashboard statistics when switching to dashboard
+                            setTimeout(function() {
+                                loadDashboardStats();
+                            }, 100);
+                            break;
+                        case "upload":
+                            content = new Panel({
+                                headerText: "Document Upload",
+                                content: [
+                                    new VBox({
+                                        items: [
+                                            new Text({
+                                                text: "Upload your legal documents here for AI analysis."
+                                            }),
+                                            new sap.m.Select({
+                                                id: "docTypeSelect_" + Date.now(), // Make ID unique
+                                                items: [
+                                                    new sap.ui.core.Item({ key: "CONTRACT", text: "Contract" }),
+                                                    new sap.ui.core.Item({ key: "NDA", text: "Non-Disclosure Agreement" }),
+                                                    new sap.ui.core.Item({ key: "AGREEMENT", text: "General Agreement" }),
+                                                    new sap.ui.core.Item({ key: "POLICY", text: "Policy Document" }),
+                                                    new sap.ui.core.Item({ key: "OTHER", text: "Other" })
+                                                ],
+                                                selectedKey: "CONTRACT",
+                                                change: function(oEvent) {
+                                                    currentDocumentType = oEvent.getParameter("selectedItem").getKey();
+                                                }
+                                            }),
+                                            new Button({
+                                                text: "Upload & Analyze",
+                                                icon: "sap-icon://upload",
+                                                type: "Emphasized",
+                                                press: function() {
+                                                    uploadDocument();
+                                                }
+                                            })
+                                        ]
+                                    })
+                                ]
+                            });
+                            break;
+                        case "ai":
+                            content = new VBox({
+                                items: [
+                                    new Panel({
+                                        headerText: "AI Assistant",
+                                        content: [
+                                            new Text({
+                                                text: "Ask questions about your documents using AI. Select a document and start chatting!",
+                                                class: "sapUiMediumMarginBottom"
+                                            }),
+                                            new Button({
+                                                text: "Start Q&A Session",
+                                                icon: "sap-icon://discussion-2",
+                                                type: "Emphasized",
+                                                press: function() {
+                                                    startAIQASession();
+                                                }
+                                            })
+                                        ]
+                                    }),
+                                    new Panel({
+                                        headerText: "Recent Q&A Sessions",
+                                        content: new VBox({
+                                            id: "recentQASessions",
+                                            items: [
+                                                new Text({
+                                                    text: "No recent Q&A sessions. Start your first session above!",
+                                                    class: "sapUiMediumMargin"
+                                                })
+                                            ]
+                                        })
+                                    })
+                                ]
+                            });
+                            // Load recent Q&A sessions when switching to AI section
+                            setTimeout(function() {
+                                loadRecentQASessions();
+                            }, 100);
+                            break;
+                        case "analytics":
+                            content = new Panel({
+                                headerText: "Analytics",
+                                content: [
+                                    new Text({ text: "View analytics and insights from your documents." }),
+                                    new Button({
+                                        text: "Generate Report",
+                                        icon: "sap-icon://pie-chart",
+                                        press: function() {
+                                            generateAnalyticsReport();
+                                        }
+                                    })
+                                ]
+                            });
+                            break;
+                        case "documents":
+                            // Create documents container and store reference
+                            currentDocumentsContainer = new VBox({
+                                items: [
+                                            new Text({
+                                                text: "Your uploaded documents and analysis history:"
+                                            }),
+                                            new Button({
+                                                text: "Refresh Documents",
+                                                icon: "sap-icon://refresh",
+                                                press: function() {
+                                                    loadUserDocuments();
+                                                }
+                                            })
+                                        ]
+                                    });
+
+                            content = new Panel({
+                                headerText: "My Documents",
+                                content: [currentDocumentsContainer]
+                            });
+
+                            // Load documents after a short delay
+                            setTimeout(loadUserDocuments, 100);
+                            break;
+                        default:
+                            content = createDashboardContent();
+                    }
+                    
+                    mainArea.addItem(content);
+                }
+                
+                app.addPage(new Page({
+                    content: [toolPage]
+                }));
+                
+                app.placeAt("content");
+
+                // Initialize user session check
+                checkUserSession();
+
+                // Load dashboard statistics
+                loadDashboardStats();
+
+                // User management functions
+                function showLoginDialog() {
+                    if (!window.loginDialog) {
+                        window.loginDialog = new sap.m.Dialog({
+                            title: "Login",
+                            content: [
+                                new VBox({
+                                    items: [
+                                        new sap.m.Input({
+                                            id: "usernameInput",
+                                            placeholder: "Username",
+                                            value: "demo"
+                                        }),
+                                        new sap.m.Input({
+                                            id: "passwordInput",
+                                            placeholder: "Password",
+                                            type: "Password",
+                                            value: "demo"
+                                        })
+                                    ]
+                                })
+                            ],
+                            beginButton: new Button({
+                                text: "Login",
+                                type: "Emphasized",
+                                press: function() {
+                                    performLogin();
+                                }
+                            }),
+                            endButton: new Button({
+                                text: "Cancel",
+                                press: function() {
+                                    window.loginDialog.close();
+                                }
+                            })
+                        });
+                    }
+                    window.loginDialog.open();
+                }
+
+                function performLogin() {
+                    var username = sap.ui.getCore().byId("usernameInput").getValue();
+                    var password = sap.ui.getCore().byId("passwordInput").getValue();
+
+                    if (!username || !password) {
+                        MessageToast.show("Please enter username and password");
+                        return;
+                    }
+
+                    // Call login service
+                    fetch('/user/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            username: username,
+                            password: password
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            currentUser = data.user;
+                            sessionToken = data.sessionToken;
+                            updateUserInterface();
+                            window.loginDialog.close();
+                            MessageToast.show("Welcome " + currentUser.firstName + "!");
+                        } else {
+                            MessageToast.show("Login failed: " + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Login error:', error);
+                        MessageToast.show("Login failed. Please try again.");
+                    });
+                }
+
+                function performLogout() {
+                    if (!sessionToken) return;
+
+                    fetch('/user/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            sessionToken: sessionToken
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        currentUser = null;
+                        sessionToken = null;
+                        updateUserInterface();
+                        MessageToast.show("Logged out successfully");
+                    })
+                    .catch(error => {
+                        console.error('Logout error:', error);
+                        currentUser = null;
+                        sessionToken = null;
+                        updateUserInterface();
+                    });
+                }
+
+                function updateUserInterface() {
+                    var userInfo = sap.ui.getCore().byId("userInfo");
+                    userInfo.removeAllItems();
+
+                    if (currentUser) {
+                        userInfo.addItem(new Text({
+                            text: "Welcome, " + currentUser.firstName
+                        }));
+                        userInfo.addItem(new Button({
+                            text: "Logout",
+                            press: function() {
+                                performLogout();
+                            }
+                        }));
+
+                        // Refresh dashboard with user data
+                        refreshDashboard();
+                    } else {
+                        userInfo.addItem(new Button({
+                            id: "loginBtn",
+                            text: "Login",
+                            type: "Emphasized",
+                            press: function() {
+                                showLoginDialog();
+                            }
+                        }));
+
+                        // Show default dashboard
+                        refreshDashboard();
+                    }
+                }
+
+                function checkUserSession() {
+                    // Check if user has an active session
+                    var storedToken = localStorage.getItem('sessionToken');
+                    if (storedToken) {
+                        sessionToken = storedToken;
+                        // Validate session with server
+                        fetch('/user/getCurrentUser', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                sessionToken: sessionToken
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(user => {
+                            if (user) {
+                                currentUser = user;
+                                updateUserInterface();
+                                localStorage.setItem('sessionToken', sessionToken);
+                            } else {
+                                localStorage.removeItem('sessionToken');
+                                sessionToken = null;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Session check error:', error);
+                            localStorage.removeItem('sessionToken');
+                            sessionToken = null;
+                        });
+                    }
+                }
+
+                function uploadDocument() {
+                    // For demo purposes, allow upload without login
+                    var fileInput = document.createElement('input');
+                    fileInput.type = 'file';
+                    fileInput.accept = '.pdf,.docx,.txt';
+
+                    fileInput.onchange = function(event) {
+                        var file = event.target.files[0];
+                        if (!file) return;
+
+                        if (file.size > 10 * 1024 * 1024) { // 10MB limit
+                            MessageToast.show("File size must be less than 10MB");
+                            return;
+                        }
+
+                        // Use global document type variable
+                        var docType = currentDocumentType;
+
+                        MessageToast.show("Uploading " + file.name + "...");
+
+                        var reader = new FileReader();
+                        reader.onload = function(e) {
+                            var base64Content = e.target.result.split(',')[1]; // Remove data:type;base64, prefix
+
+                            fetch('/legal-documents/uploadDocument', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    file: base64Content,
+                                    fileName: file.name,
+                                    documentType: docType,
+                                    sessionToken: sessionToken || 'demo-session'
+                                })
+                            })
+                            .then(response => {
+                                console.log('Upload response status:', response.status);
+                                return response.json();
+                            })
+                            .then(data => {
+                                console.log('Upload response data:', data);
+                                if (data.ID || data.success) {
+                                    MessageToast.show("Document uploaded successfully! AI analysis in progress...");
+                                    // Refresh documents list after a delay
+                                    setTimeout(function() {
+                                        loadUserDocuments();
+                                        refreshDashboard();
+                                    }, 2000);
+                                } else {
+                                    MessageToast.show("Upload failed: " + (data.message || data.error || "Unknown error"));
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Upload error:', error);
+                                MessageToast.show("Upload failed. Please try again. Error: " + error.message);
+                            });
+                        };
+
+                        reader.readAsDataURL(file);
+                    };
+
+                    fileInput.click();
+                }
+
+                function loadUserDocuments() {
+                    if (!currentDocumentsContainer) {
+                        console.log("Documents container not available");
+                        return;
+                    }
+
+                    // Load all documents for demo (since we simplified user auth)
+                    fetch('/legal-documents/Documents?$orderby=createdAt desc')
+                        .then(response => response.json())
+                        .then(data => {
+                            var container = currentDocumentsContainer;
+
+                            // Remove existing document items (keep first 3 items: text, refresh button, login button)
+                            var items = container.getItems();
+                            for (var i = items.length - 1; i >= 2; i--) {
+                                container.removeItem(items[i]);
+                            }
+
+                            if (data.value && data.value.length > 0) {
+                                data.value.forEach(function(doc) {
+                                    var statusIcon = doc.status === 'PROCESSED' ? '✅' :
+                                                   doc.status === 'PROCESSING' ? '⏳' :
+                                                   doc.status === 'ERROR' ? '❌' : '📄';
+
+                                    var docPanel = new Panel({
+                                        headerText: statusIcon + " " + doc.title,
+                                        expandable: true,
+                                        content: [
+                                            new VBox({
+                                                items: [
+                                                    new Text({ text: "File: " + doc.fileName }),
+                                                    new Text({ text: "Type: " + doc.documentType }),
+                                                    new Text({ text: "Status: " + doc.status }),
+                                                    new Text({ text: "Uploaded: " + new Date(doc.createdAt).toLocaleString() }),
+                                                    new Text({
+                                                        text: "Summary: " + (doc.summary || "Analysis pending..."),
+                                                        maxLines: 3
+                                                    }),
+                                                    new Button({
+                                                        text: "Ask Question",
+                                                        icon: "sap-icon://discussion-2",
+                                                        enabled: doc.status === 'PROCESSED',
+                                                        press: function() {
+                                                            askQuestionAboutDocument(doc.ID, doc.title);
+                                                        }
+                                                    })
+                                                ]
+                                            })
+                                        ]
+                                    });
+
+                                    container.addItem(docPanel);
+                                });
+                            } else {
+                                container.addItem(new Text({
+                                    text: "No documents uploaded yet. Use the Document Upload section to get started!"
+                                }));
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error loading documents:', error);
+                            MessageToast.show("Failed to load documents");
+                        });
+                }
+
+                function askQuestionAboutDocument(documentId, documentTitle) {
+                    if (!window.questionDialog) {
+                        window.questionDialog = new sap.m.Dialog({
+                            title: "Ask Question",
+                            content: [
+                                new VBox({
+                                    items: [
+                                        new Text({
+                                            id: "questionDocTitle",
+                                            text: ""
+                                        }),
+                                        new sap.m.TextArea({
+                                            id: "questionTextArea",
+                                            placeholder: "Ask a question about this document...",
+                                            rows: 4,
+                                            width: "100%"
+                                        })
+                                    ]
+                                })
+                            ],
+                            beginButton: new Button({
+                                text: "Ask AI",
+                                type: "Emphasized",
+                                press: function() {
+                                    submitQuestion();
+                                }
+                            }),
+                            endButton: new Button({
+                                text: "Cancel",
+                                press: function() {
+                                    window.questionDialog.close();
+                                }
+                            })
+                        });
+                    }
+
+                    sap.ui.getCore().byId("questionDocTitle").setText("Document: " + documentTitle);
+                    sap.ui.getCore().byId("questionTextArea").setValue("");
+                    window.currentDocumentId = documentId;
+                    window.questionDialog.open();
+                }
+
+                function submitQuestion() {
+                    var question = sap.ui.getCore().byId("questionTextArea").getValue();
+                    if (!question.trim()) {
+                        MessageToast.show("Please enter a question");
+                        return;
+                    }
+
+                    MessageToast.show("AI is analyzing your question...");
+                    window.questionDialog.close();
+
+                    fetch('/legal-documents/DocumentQueries/askQuestion', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            documentId: window.currentDocumentId,
+                            question: question,
+                            queryType: 'GENERAL'
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.response) {
+                            var confidence = Math.round(data.confidence * 100);
+                            var method = data.method || 'AI';
+
+                            sap.m.MessageBox.show(
+                                data.response,
+                                {
+                                    title: "AI Response (" + confidence + "% confidence, " + method + ")",
+                                    actions: [sap.m.MessageBox.Action.OK]
+                                }
+                            );
+                        } else {
+                            MessageToast.show("No response received from AI");
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Question error:', error);
+                        MessageToast.show("Failed to get AI response. Please try again.");
+                    });
+                }
+
+                function loadDashboardStats() {
+                    // Load all document statistics (since we removed user filtering)
+                    fetch('/legal-documents/Documents?$count=true')
+                        .then(response => response.json())
+                        .then(data => {
+                            var totalDocs = data['@odata.count'] || data.value?.length || 0;
+                            updateStatCard(0, "Documents Uploaded", totalDocs.toString());
+                        })
+                        .catch(error => {
+                            console.error('Error loading document stats:', error);
+                            // Fallback: try without count
+                            fetch('/legal-documents/Documents')
+                                .then(response => response.json())
+                                .then(data => {
+                                    var totalDocs = data.value ? data.value.length : 0;
+                                    updateStatCard(0, "Documents Uploaded", totalDocs.toString());
+                                })
+                                .catch(err => console.error('Fallback error:', err));
+                        });
+
+                    // Calculate AI analyses (processed documents)
+                    fetch('/legal-documents/Documents?$filter=status eq \'PROCESSED\'&$count=true')
+                        .then(response => response.json())
+                        .then(data => {
+                            var processedDocs = data['@odata.count'] || 0;
+                            updateStatCard(1, "AI Analyses", processedDocs.toString());
+                        })
+                        .catch(error => {
+                            console.error('Error loading analysis stats:', error);
+                            // Fallback: count processed documents manually
+                            fetch('/legal-documents/Documents')
+                                .then(response => response.json())
+                                .then(data => {
+                                    var processedDocs = data.value ? data.value.filter(d => d.status === 'PROCESSED').length : 0;
+                                    updateStatCard(1, "AI Analyses", processedDocs.toString());
+                                })
+                                .catch(err => console.error('Fallback error:', err));
+                        });
+
+                    // For now, set queries to 0 since we don't have query tracking yet
+                    updateStatCard(2, "Questions Asked", "0");
+                }
+
+                function updateStatCard(index, title, value) {
+                    // Store the stats globally so they can be used when creating dashboard
+                    if (!window.dashboardStats) {
+                        window.dashboardStats = {};
+                    }
+                    window.dashboardStats[index] = { title: title, value: value };
+
+                    console.log('Updated stat:', title, '=', value);
+
+                    // If we're currently viewing the dashboard, refresh it
+                    var mainArea = sap.ui.getCore().byId("mainContentArea");
+                    if (mainArea && mainArea.getItems().length > 0) {
+                        var currentContent = mainArea.getItems()[0];
+                        // Check if we're on dashboard by looking for stat cards
+                        if (currentContent && currentContent.getItems) {
+                            var items = currentContent.getItems();
+                            if (items.length > 0 && items[0].getItems && items[0].getItems().length > 0) {
+                                var firstRow = items[0].getItems()[0];
+                                if (firstRow && firstRow.getItems && firstRow.getItems().length >= 3) {
+                                    // We're on dashboard, refresh it to show new stats
+                                    setTimeout(function() {
+                                        refreshDashboard();
+                                    }, 100);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                function refreshDashboard() {
+                    var mainArea = sap.ui.getCore().byId("mainContentArea");
+                    if (mainArea) {
+                        mainArea.removeAllItems();
+                        mainArea.addItem(createDashboardContent());
+                        // Always load dashboard stats (removed user requirement)
+                        loadDashboardStats();
+                    }
+                }
+
+                function generateAnalyticsReport() {
+                    MessageToast.show("Generating analytics report...");
+
+                    // Fetch analytics data from multiple endpoints
+                    Promise.all([
+                        fetch('/legal-documents/DocumentStatistics').then(r => r.json()),
+                        fetch('/legal-documents/DocumentSummary').then(r => r.json()),
+                        fetch('/legal-documents/RecentActivity').then(r => r.json()),
+                        fetch('/legal-documents/Documents').then(r => r.json())
+                    ]).then(function(results) {
+                        var [stats, summary, activity, documents] = results;
+
+                        // Create analytics report dialog
+                        if (!window.analyticsDialog) {
+                            window.analyticsDialog = new sap.m.Dialog({
+                                title: "Analytics Report",
+                                contentWidth: "800px",
+                                contentHeight: "600px",
+                                verticalScrolling: true,
+                                content: new sap.m.VBox({
+                                    items: [
+                                        new sap.m.Panel({
+                                            headerText: "📊 Document Overview",
+                                            content: new sap.m.VBox({ id: "analyticsOverview" })
+                                        }),
+                                        new sap.m.Panel({
+                                            headerText: "📈 Document Statistics",
+                                            content: new sap.m.VBox({ id: "analyticsStats" })
+                                        }),
+                                        new sap.m.Panel({
+                                            headerText: "⏰ Recent Activity",
+                                            content: new sap.m.VBox({ id: "analyticsActivity" })
+                                        })
+                                    ]
+                                }),
+                                beginButton: new sap.m.Button({
+                                    text: "Export PDF",
+                                    icon: "sap-icon://pdf-attachment",
+                                    press: function() {
+                                        MessageToast.show("PDF export functionality would be implemented here");
+                                    }
+                                }),
+                                endButton: new sap.m.Button({
+                                    text: "Close",
+                                    press: function() {
+                                        window.analyticsDialog.close();
+                                    }
+                                })
+                            });
+                        }
+
+                        // Populate analytics data
+                        populateAnalyticsReport(documents, stats, summary, activity);
+                        window.analyticsDialog.open();
+
+                    }).catch(function(error) {
+                        console.error('Error fetching analytics:', error);
+                        MessageToast.show("Error loading analytics data");
+                    });
+                }
+
+                function populateAnalyticsReport(documents, stats, summary, activity) {
+                    var overview = sap.ui.getCore().byId("analyticsOverview");
+                    var statsPanel = sap.ui.getCore().byId("analyticsStats");
+                    var activityPanel = sap.ui.getCore().byId("analyticsActivity");
+
+                    // Clear existing content
+                    overview.removeAllItems();
+                    statsPanel.removeAllItems();
+                    activityPanel.removeAllItems();
+
+                    // Overview section
+                    var totalDocs = documents.value ? documents.value.length : 0;
+                    var processedDocs = documents.value ? documents.value.filter(d => d.status === 'PROCESSED').length : 0;
+                    var totalSize = documents.value ? documents.value.reduce((sum, d) => sum + (d.fileSize || 0), 0) : 0;
+
+                    overview.addItem(new sap.m.Text({
+                        text: "📋 Total Documents: " + totalDocs,
+                        class: "sapUiMediumMarginBottom"
+                    }));
+                    overview.addItem(new sap.m.Text({
+                        text: "✅ Processed Documents: " + processedDocs,
+                        class: "sapUiMediumMarginBottom"
+                    }));
+                    overview.addItem(new sap.m.Text({
+                        text: "💾 Total Storage Used: " + formatFileSize(totalSize),
+                        class: "sapUiMediumMarginBottom"
+                    }));
+
+                    // Document types breakdown
+                    if (documents.value && documents.value.length > 0) {
+                        var typeCount = {};
+                        documents.value.forEach(function(doc) {
+                            typeCount[doc.documentType] = (typeCount[doc.documentType] || 0) + 1;
+                        });
+
+                        overview.addItem(new sap.m.Text({
+                            text: "📊 Document Types:",
+                            class: "sapUiMediumMarginTop"
+                        }));
+
+                        Object.keys(typeCount).forEach(function(type) {
+                            overview.addItem(new sap.m.Text({
+                                text: "   • " + type + ": " + typeCount[type],
+                                class: "sapUiSmallMarginLeft"
+                            }));
+                        });
+                    }
+
+                    // Statistics section
+                    if (stats.value && stats.value.length > 0) {
+                        stats.value.forEach(function(stat) {
+                            statsPanel.addItem(new sap.m.Text({
+                                text: "📄 " + stat.title + " (" + stat.documentType + ")",
+                                class: "sapUiMediumMarginBottom"
+                            }));
+                            statsPanel.addItem(new sap.m.Text({
+                                text: "   Status: " + stat.status,
+                                class: "sapUiSmallMarginLeft"
+                            }));
+                        });
+                    } else {
+                        statsPanel.addItem(new sap.m.Text({
+                            text: "No detailed statistics available yet. Upload more documents to see analytics."
+                        }));
+                    }
+
+                    // Activity section
+                    if (activity.value && activity.value.length > 0) {
+                        activity.value.forEach(function(item) {
+                            var date = new Date(item.createdAt).toLocaleString();
+                            activityPanel.addItem(new sap.m.Text({
+                                text: "📅 " + date + " - " + item.title + " (" + item.status + ")",
+                                class: "sapUiMediumMarginBottom"
+                            }));
+                        });
+                    } else {
+                        activityPanel.addItem(new sap.m.Text({
+                            text: "No recent activity to display."
+                        }));
+                    }
+                }
+
+                function formatFileSize(bytes) {
+                    if (bytes === 0) return '0 Bytes';
+                    var k = 1024;
+                    var sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                    var i = Math.floor(Math.log(bytes) / Math.log(k));
+                    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+                }
+
+                function startAIQASession() {
+                    // First, load available documents
+                    fetch('/legal-documents/Documents?$orderby=createdAt desc')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (!data.value || data.value.length === 0) {
+                                MessageToast.show("Please upload a document first before starting Q&A");
+                                return;
+                            }
+
+                            // Show document selection dialog
+                            showDocumentSelectionDialog(data.value);
+                        })
+                        .catch(error => {
+                            console.error('Error loading documents:', error);
+                            MessageToast.show("Error loading documents. Please try again.");
+                        });
+                }
+
+                function showDocumentSelectionDialog(documents) {
+                    if (!window.documentSelectionDialog) {
+                        window.documentSelectionDialog = new sap.m.Dialog({
+                            title: "Select Document for Q&A",
+                            contentWidth: "500px",
+                            content: new VBox({
+                                items: [
+                                    new Text({
+                                        text: "Choose a document to ask questions about:",
+                                        class: "sapUiMediumMarginBottom"
+                                    }),
+                                    new sap.m.List({
+                                        id: "documentSelectionList",
+                                        mode: "SingleSelect"
+                                    })
+                                ]
+                            }),
+                            beginButton: new Button({
+                                text: "Start Q&A",
+                                type: "Emphasized",
+                                press: function() {
+                                    var list = sap.ui.getCore().byId("documentSelectionList");
+                                    var selectedItem = list.getSelectedItem();
+                                    if (selectedItem) {
+                                        var documentId = selectedItem.data("documentId");
+                                        var documentTitle = selectedItem.data("documentTitle");
+                                        window.documentSelectionDialog.close();
+                                        openQAChat(documentId, documentTitle);
+                                    } else {
+                                        MessageToast.show("Please select a document");
+                                    }
+                                }
+                            }),
+                            endButton: new Button({
+                                text: "Cancel",
+                                press: function() {
+                                    window.documentSelectionDialog.close();
+                                }
+                            })
+                        });
+                    }
+
+                    // Populate document list
+                    var list = sap.ui.getCore().byId("documentSelectionList");
+                    list.removeAllItems();
+
+                    documents.forEach(function(doc) {
+                        var statusIcon = doc.status === 'PROCESSED' ? '✅' :
+                                       doc.status === 'PROCESSING' ? '⏳' : '❌';
+
+                        var listItem = new sap.m.StandardListItem({
+                            title: doc.title,
+                            description: "Type: " + doc.documentType + " | Status: " + doc.status + " " + statusIcon,
+                            icon: "sap-icon://document",
+                            type: "Active"
+                        });
+
+                        listItem.data("documentId", doc.ID);
+                        listItem.data("documentTitle", doc.title);
+
+                        // Only enable processed documents
+                        if (doc.status !== 'PROCESSED') {
+                            listItem.setEnabled(false);
+                        }
+
+                        list.addItem(listItem);
+                    });
+
+                    window.documentSelectionDialog.open();
+                }
+
+                function openQAChat(documentId, documentTitle) {
+                    if (!window.qaChatDialog) {
+                        window.qaChatDialog = new sap.m.Dialog({
+                            title: "AI Q&A Chat",
+                            contentWidth: "800px",
+                            contentHeight: "600px",
+                            verticalScrolling: false,
+                            content: new VBox({
+                                items: [
+                                    new Panel({
+                                        headerText: "Document: " + documentTitle,
+                                        content: new VBox({
+                                            items: [
+                                                new sap.m.ScrollContainer({
+                                                    id: "chatMessages",
+                                                    height: "400px",
+                                                    vertical: true,
+                                                    content: new VBox({
+                                                        items: [
+                                                            new sap.m.MessageStrip({
+                                                                text: "Welcome! Ask me anything about this document. I can help you understand contracts, find specific clauses, explain legal terms, and more.",
+                                                                type: "Information",
+                                                                class: "sapUiMediumMargin"
+                                                            })
+                                                        ]
+                                                    })
+                                                }),
+                                                new sap.m.HBox({
+                                                    items: [
+                                                        new sap.m.Input({
+                                                            id: "chatInput",
+                                                            placeholder: "Type your question here...",
+                                                            width: "100%",
+                                                            submit: function() {
+                                                                sendChatMessage(documentId);
+                                                            }
+                                                        }),
+                                                        new Button({
+                                                            text: "Send",
+                                                            icon: "sap-icon://paper-plane",
+                                                            type: "Emphasized",
+                                                            press: function() {
+                                                                sendChatMessage(documentId);
+                                                            }
+                                                        })
+                                                    ]
+                                                })
+                                            ]
+                                        })
+                                    })
+                                ]
+                            }),
+                            endButton: new Button({
+                                text: "Close",
+                                press: function() {
+                                    window.qaChatDialog.close();
+                                }
+                            })
+                        });
+                    } else {
+                        // Update title for new document
+                        var panel = window.qaChatDialog.getContent()[0].getItems()[0];
+                        panel.setHeaderText("Document: " + documentTitle);
+
+                        // Clear previous chat
+                        var chatContainer = sap.ui.getCore().byId("chatMessages").getContent()[0];
+                        chatContainer.removeAllItems();
+                        chatContainer.addItem(new sap.m.MessageStrip({
+                            text: "Welcome! Ask me anything about this document. I can help you understand contracts, find specific clauses, explain legal terms, and more.",
+                            type: "Information",
+                            class: "sapUiMediumMargin"
+                        }));
+                    }
+
+                    window.currentChatDocumentId = documentId;
+                    window.qaChatDialog.open();
+
+                    // Focus on input
+                    setTimeout(function() {
+                        var input = sap.ui.getCore().byId("chatInput");
+                        if (input) {
+                            input.focus();
+                        }
+                    }, 100);
+                }
+
+                function sendChatMessage(documentId) {
+                    var input = sap.ui.getCore().byId("chatInput");
+                    var question = input.getValue().trim();
+
+                    if (!question) {
+                        MessageToast.show("Please enter a question");
+                        return;
+                    }
+
+                    // Clear input
+                    input.setValue("");
+
+                    // Add user message to chat
+                    addChatMessage("user", question);
+
+                    // Add thinking indicator
+                    var thinkingMessage = addChatMessage("assistant", "🤔 Thinking...");
+
+                    // Send question to AI service
+                    fetch('/legal-documents/Documents(' + documentId + ')/askQuestion', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            question: question
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Remove thinking indicator
+                        removeChatMessage(thinkingMessage);
+
+                        if (data.answer) {
+                            addChatMessage("assistant", data.answer);
+                        } else {
+                            addChatMessage("assistant", "I'm sorry, I couldn't process your question. Please try rephrasing it.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error asking question:', error);
+                        // Remove thinking indicator
+                        removeChatMessage(thinkingMessage);
+                        addChatMessage("assistant", "I'm sorry, there was an error processing your question. Please try again.");
+                    });
+                }
+
+                function addChatMessage(sender, message) {
+                    var chatContainer = sap.ui.getCore().byId("chatMessages").getContent()[0];
+                    var isUser = sender === "user";
+
+                    var messageItem = new sap.m.HBox({
+                        justifyContent: isUser ? "End" : "Start",
+                        class: "sapUiSmallMarginTop",
+                        items: [
+                            new sap.m.VBox({
+                                width: "70%",
+                                items: [
+                                    new sap.m.Text({
+                                        text: isUser ? "You" : "AI Assistant",
+                                        class: "sapUiTinyMarginBottom"
+                                    }),
+                                    new sap.m.FormattedText({
+                                        htmlText: message.replace(/\n/g, '<br>'),
+                                        class: isUser ? "sapUiMediumMargin" : "sapUiMediumMargin",
+                                        width: "100%"
+                                    })
+                                ]
+                            })
+                        ]
+                    });
+
+                    // Style the message box
+                    if (isUser) {
+                        messageItem.addStyleClass("userMessage");
+                    } else {
+                        messageItem.addStyleClass("assistantMessage");
+                    }
+
+                    chatContainer.addItem(messageItem);
+
+                    // Scroll to bottom
+                    setTimeout(function() {
+                        var scrollContainer = sap.ui.getCore().byId("chatMessages");
+                        if (scrollContainer) {
+                            scrollContainer.scrollToElement(messageItem);
+                        }
+                    }, 100);
+
+                    return messageItem;
+                }
+
+                function removeChatMessage(messageItem) {
+                    var chatContainer = sap.ui.getCore().byId("chatMessages").getContent()[0];
+                    chatContainer.removeItem(messageItem);
+                }
+
+                function loadRecentQASessions() {
+                    // For now, show placeholder - in a real app this would load from database
+                    var sessionsContainer = sap.ui.getCore().byId("recentQASessions");
+                    if (sessionsContainer) {
+                        sessionsContainer.removeAllItems();
+                        sessionsContainer.addItem(new Text({
+                            text: "💬 Recent Q&A sessions will appear here after you start chatting with documents.",
+                            class: "sapUiMediumMargin"
+                        }));
+                        sessionsContainer.addItem(new Text({
+                            text: "🚀 Tip: Try asking questions like 'What are the key terms?', 'Summarize this contract', or 'What are the payment terms?'",
+                            class: "sapUiMediumMargin"
+                        }));
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

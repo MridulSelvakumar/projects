@@ -2,125 +2,189 @@
     controllerName="legal.document.analyzer.ui.controller.Main"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns:core="sap.ui.core"
-    xmlns:f="sap.f"
     xmlns:upload="sap.m.upload"
-    xmlns="sap.m">
-    
-    <Page id="page" title="{i18n>mainPageTitle}" showNavButton="false">
-        <content>
-            <f:DynamicPage id="dynamicPage">
-                <f:title>
-                    <f:DynamicPageTitle>
-                        <f:heading>
-                            <Title text="{i18n>legalDocumentAnalyzer}"/>
-                        </f:heading>
-                        <f:actions>
-                            <Button 
-                                text="{i18n>uploadDocument}" 
-                                type="Emphasized"
-                                icon="sap-icon://upload"
-                                press="onUploadPress"/>
-                        </f:actions>
-                    </f:DynamicPageTitle>
-                </f:title>
-                
-                <f:content>
-                    <VBox class="sapUiMediumMargin">
-                        
-                        <!-- Document Upload Section -->
-                        <Panel headerText="{i18n>documentUpload}" expandable="true" expanded="true" class="sapUiResponsiveMargin">
+    xmlns:tnt="sap.tnt"
+    xmlns="sap.m"
+    displayBlock="true">
+
+    <!-- TESTING: This comment should appear if the file is being served correctly -->
+
+    <tnt:ToolPage id="toolPage">
+        <tnt:header>
+            <tnt:ToolHeader id="toolHeader">
+                <Image id="sapLogo" src="https://www.sap.com/dam/application/shared/logos/sap-logo-svg.svg"
+                       height="32px" class="sapUiTinyMarginEnd"/>
+                <Title id="appTitle" text="Legal Document Analyzer" level="H4" class="sapUiMediumMarginBegin"/>
+                <tnt:ToolHeaderUtilitySeparator id="separator"/>
+                <Button id="refreshBtn" icon="sap-icon://refresh" tooltip="Refresh" press="onRefresh"/>
+                <Button id="settingsBtn" icon="sap-icon://action-settings" tooltip="Settings" press="onSettings"/>
+            </tnt:ToolHeader>
+        </tnt:header>
+
+        <tnt:sideContent>
+            <tnt:SideNavigation id="sideNavigation" expanded="true">
+                <tnt:NavigationList id="navigationList">
+                    <tnt:NavigationListItem id="dashboardNav" text="Dashboard" icon="sap-icon://home" key="dashboard" select="onNavItemSelect"/>
+                    <tnt:NavigationListItem id="uploadNav" text="Document Upload" icon="sap-icon://upload" key="upload" select="onNavItemSelect"/>
+                    <tnt:NavigationListItem id="assistantNav" text="AI Assistant" icon="sap-icon://robot" key="assistant" select="onNavItemSelect"/>
+                    <tnt:NavigationListItem id="analyticsNav" text="Analytics" icon="sap-icon://bar-chart" key="analytics" select="onNavItemSelect"/>
+                    <tnt:NavigationListItem id="settingsNavItem" text="Settings" icon="sap-icon://action-settings" key="settings" select="onNavItemSelect"/>
+                </tnt:NavigationList>
+            </tnt:SideNavigation>
+        </tnt:sideContent>
+
+        <tnt:mainContents>
+            <Page id="mainPage" showHeader="false" class="sapUiContentPadding">
+                <content>
+                    <!-- Document Upload Section -->
+                    <VBox id="uploadSection" visible="false" class="sapUiMediumMargin">
+                        <Title id="uploadTitle" text="Document Upload" level="H2" class="sapUiMediumMarginBottom"/>
+                        <Panel id="uploadPanel" class="sapUiResponsiveMargin">
                             <content>
-                                <VBox class="sapUiMediumMargin">
-                                    <upload:UploadSet
-                                        id="uploadSet"
-                                        maxFilenameLength="55"
-                                        maxFileSize="50"
-                                        mediaTypes="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
-                                        uploadEnabled="true"
-                                        terminationEnabled="true"
-                                        fileDeleted="onFileDeleted"
-                                        fileSizeExceeded="onFileSizeExceeded"
-                                        fileTypeMismatch="onFileTypeMismatch"
-                                        uploadCompleted="onUploadCompleted">
-                                        <upload:toolbar>
-                                            <OverflowToolbar>
-                                                <Title text="{i18n>uploadDocuments}"/>
-                                                <ToolbarSpacer/>
-                                                <Select id="documentTypeSelect" selectedKey="CONTRACT">
-                                                    <core:Item key="CONTRACT" text="{i18n>contract}"/>
-                                                    <core:Item key="NDA" text="{i18n>nda}"/>
-                                                    <core:Item key="AGREEMENT" text="{i18n>agreement}"/>
-                                                    <core:Item key="POLICY" text="{i18n>policy}"/>
-                                                    <core:Item key="OTHER" text="{i18n>other}"/>
-                                                </Select>
-                                            </OverflowToolbar>
-                                        </upload:toolbar>
-                                    </upload:UploadSet>
+                                <VBox id="uploadContent" class="sapUiMediumMargin">
+                                    <Text id="uploadDescription" text="Upload legal documents (PDF, DOCX, TXT) for AI powered analysis"
+                                          class="sapUiSmallMarginBottom"/>
+
+                                    <HBox id="uploadControls" alignItems="Center" class="sapUiMediumMarginBottom">
+                                        <Button id="chooseFileBtn"
+                                                text="Choose File"
+                                                icon="sap-icon://attachment"
+                                                press="onChooseFile"
+                                                class="sapUiTinyMarginEnd"/>
+                                        <Text id="fileNameText" text="No file chosen" class="sapUiTinyMarginEnd"/>
+                                        <Select id="documentTypeSelect"
+                                                selectedKey="Contract"
+                                                width="150px"
+                                                class="sapUiTinyMarginEnd">
+                                            <core:Item id="contractItem" key="Contract" text="Contract"/>
+                                            <core:Item id="ndaItem" key="NDA" text="NDA"/>
+                                            <core:Item id="agreementItem" key="Agreement" text="Agreement"/>
+                                            <core:Item id="policyItem" key="Policy" text="Policy"/>
+                                        </Select>
+                                    </HBox>
+
+                                    <Button id="uploadDocumentBtn"
+                                            text="Upload Document"
+                                            type="Emphasized"
+                                            icon="sap-icon://upload"
+                                            press="onUploadDocument"
+                                            enabled="false"/>
+
+                                    <Link id="viewUploadedLink" text="📋 View Uploaded Documents"
+                                          press="onViewUploaded"
+                                          class="sapUiMediumMarginTop"/>
                                 </VBox>
                             </content>
                         </Panel>
-                        
-                        <!-- Document List Section -->
-                        <Panel headerText="{i18n>documentList}" expandable="true" expanded="true" class="sapUiResponsiveMargin">
+                    </VBox>
+
+                    <!-- AI Assistant Section -->
+                    <VBox id="assistantSection" visible="true" class="sapUiMediumMargin">
+                        <Title id="assistantTitle" text="AI Assistant" level="H2" class="sapUiMediumMarginBottom"/>
+                        <Panel id="assistantPanel" class="sapUiResponsiveMargin">
                             <content>
-                                <Table 
-                                    id="documentsTable"
-                                    items="{/Documents}"
-                                    growing="true"
-                                    growingThreshold="20"
-                                    mode="SingleSelection"
-                                    selectionChange="onDocumentSelect">
-                                    <headerToolbar>
-                                        <OverflowToolbar>
-                                            <Title text="{i18n>documents}"/>
-                                            <ToolbarSpacer/>
-                                            <SearchField 
-                                                id="searchField"
-                                                width="20rem"
-                                                search="onSearch"
-                                                placeholder="{i18n>searchDocuments}"/>
-                                        </OverflowToolbar>
-                                    </headerToolbar>
+                                <VBox id="assistantContent" class="sapUiMediumMargin">
+                                    <Text id="assistantDescription" text="Ask questions about your documents using AI powered natural language processing"
+                                          class="sapUiSmallMarginBottom"/>
+
+                                    <VBox id="questionSection" class="sapUiMediumMarginTop">
+                                        <Label id="questionLabel" text="Ask a question (e.g., 'What are the liability limitations?')" class="sapUiTinyMarginBottom"/>
+                                        <TextArea id="questionInput"
+                                                 placeholder="Ask about all documents"
+                                                 rows="3"
+                                                 width="100%"
+                                                 class="sapUiTinyMarginBottom"/>
+                                        <Select id="documentSelect"
+                                                width="100%"
+                                                class="sapUiTinyMarginBottom">
+                                            <core:Item id="allDocsItem" key="all" text="Ask about all documents"/>
+                                        </Select>
+                                        <Button id="askQuestionBtn"
+                                                text="🔍 Ask AI Question"
+                                                type="Emphasized"
+                                                press="onAskQuestion"/>
+                                    </VBox>
+
+                                    <Link id="loadDocumentsLink" text="📄 Load Documents for Q&amp;A"
+                                          press="onLoadDocuments"
+                                          class="sapUiMediumMarginTop"/>
+                                </VBox>
+                            </content>
+                        </Panel>
+                    </VBox>
+
+                    <!-- Analytics Section -->
+                    <VBox id="analyticsSection" visible="false" class="sapUiMediumMargin">
+                        <Title id="analyticsTitle" text="Analytics" level="H2" class="sapUiMediumMarginBottom"/>
+                        <Panel id="analyticsPanel" class="sapUiResponsiveMargin">
+                            <content>
+                                <VBox id="analyticsContent" class="sapUiMediumMargin">
+                                    <Text id="analyticsDescription" text="AI-powered clause extraction, entity recognition, and semantic search"
+                                          class="sapUiSmallMarginBottom"/>
+
+                                    <Link id="viewAnalyticsLink" text="📊 View Analytics Dashboard"
+                                          press="onViewAnalytics"/>
+                                </VBox>
+                            </content>
+                        </Panel>
+                    </VBox>
+
+                    <!-- Dashboard Section -->
+                    <VBox id="dashboardSection" visible="false" class="sapUiMediumMargin">
+                        <Title id="dashboardTitle" text="Daily Activities" level="H2" class="sapUiMediumMarginBottom"/>
+
+                        <!-- Activities Table -->
+                        <Panel id="activitiesPanel" class="sapUiResponsiveMargin">
+                            <headerToolbar>
+                                <Toolbar id="activitiesToolbar">
+                                    <Title id="activitiesTitle" text="Daily Activities" level="H3"/>
+                                    <ToolbarSpacer id="activitiesSpacer"/>
+                                    <Button id="addActivityBtn" text="Add Activity" icon="sap-icon://add" press="onAddActivity"/>
+                                </Toolbar>
+                            </headerToolbar>
+                            <content>
+                                <Table id="activitiesTable"
+                                       items="{local>/activities}"
+                                       class="sapUiResponsiveMargin"
+                                       mode="SingleSelect">
                                     <columns>
-                                        <Column>
-                                            <Text text="{i18n>title}"/>
+                                        <Column id="activityCol">
+                                            <Text id="activityHeader" text="Activity"/>
                                         </Column>
-                                        <Column>
-                                            <Text text="{i18n>documentType}"/>
+                                        <Column id="categoryCol">
+                                            <Text id="categoryHeader" text="Category"/>
                                         </Column>
-                                        <Column>
-                                            <Text text="{i18n>status}"/>
+                                        <Column id="priorityCol">
+                                            <Text id="priorityHeader" text="Priority"/>
                                         </Column>
-                                        <Column>
-                                            <Text text="{i18n>uploadedBy}"/>
+                                        <Column id="statusCol">
+                                            <Text id="statusHeader" text="Status"/>
                                         </Column>
-                                        <Column>
-                                            <Text text="{i18n>uploadDate}"/>
+                                        <Column id="dateCol">
+                                            <Text id="dateHeader" text="Date"/>
                                         </Column>
-                                        <Column>
-                                            <Text text="{i18n>actions}"/>
+                                        <Column id="timeCol">
+                                            <Text id="timeHeader" text="Time (min)"/>
+                                        </Column>
+                                        <Column id="actionsCol">
+                                            <Text id="actionsHeader" text="Actions"/>
                                         </Column>
                                     </columns>
                                     <items>
-                                        <ColumnListItem press="onDocumentPress">
+                                        <ColumnListItem id="activityItem">
                                             <cells>
-                                                <Text text="{title}"/>
-                                                <Text text="{documentType}"/>
-                                                <ObjectStatus 
-                                                    text="{status}"
-                                                    state="{path: 'status', formatter: '.formatStatus'}"/>
-                                                <Text text="{uploadedBy}"/>
-                                                <Text text="{path: 'createdAt', type: 'sap.ui.model.odata.type.DateTimeOffset'}"/>
-                                                <HBox>
-                                                    <Button 
-                                                        icon="sap-icon://detail-view" 
-                                                        tooltip="{i18n>viewDetails}"
-                                                        press="onViewDetails"/>
-                                                    <Button 
-                                                        icon="sap-icon://delete" 
-                                                        tooltip="{i18n>delete}"
-                                                        press="onDeleteDocument"
-                                                        type="Transparent"/>
+                                                <VBox id="activityCell">
+                                                    <Text id="activityName" text="{name}" class="sapUiTinyMarginBottom"/>
+                                                    <Text id="activityDesc" text="{description}" class="sapUiSmallText"/>
+                                                </VBox>
+                                                <Text id="categoryText" text="{category}"/>
+                                                <ObjectStatus id="priorityStatus" text="{priority}" state="{priorityState}"/>
+                                                <ObjectStatus id="statusStatus" text="{status}" state="{statusState}"/>
+                                                <Text id="dateText" text="{date}"/>
+                                                <Text id="timeText" text="{time}"/>
+                                                <HBox id="actionsBox">
+                                                    <Button id="editBtn" icon="sap-icon://edit" type="Transparent" press="onEditActivity"/>
+                                                    <Button id="deleteBtn" icon="sap-icon://delete" type="Transparent" press="onDeleteActivity"/>
                                                 </HBox>
                                             </cells>
                                         </ColumnListItem>
@@ -128,81 +192,51 @@
                                 </Table>
                             </content>
                         </Panel>
-                        
-                        <!-- AI Chat Interface Section -->
-                        <Panel headerText="{i18n>aiAssistant}" expandable="true" expanded="false" class="sapUiResponsiveMargin">
+
+                        <!-- Statistics Panel -->
+                        <Panel id="statisticsPanel" class="sapUiResponsiveMargin">
+                            <headerToolbar>
+                                <Toolbar id="statisticsToolbar">
+                                    <Title id="statisticsTitle" text="Activity Statistics" level="H3"/>
+                                </Toolbar>
+                            </headerToolbar>
                             <content>
-                                <VBox class="sapUiMediumMargin">
-                                    <MessageStrip 
-                                        text="{i18n>selectDocumentForChat}"
-                                        type="Information"
-                                        visible="{= !${/selectedDocument}}"/>
-                                    
-                                    <VBox visible="{= !!${/selectedDocument}}">
-                                        <Text text="{i18n>chatWithDocument}: {/selectedDocument/title}" class="sapUiMediumMarginBottom"/>
-                                        
-                                        <!-- Chat Messages -->
-                                        <ScrollContainer 
-                                            id="chatContainer"
-                                            height="400px"
-                                            vertical="true"
-                                            class="sapUiMediumMarginBottom chatContainer">
-                                            <VBox id="chatMessages" class="sapUiSmallMargin">
-                                                <!-- Chat messages will be added dynamically -->
-                                            </VBox>
-                                        </ScrollContainer>
-                                        
-                                        <!-- Chat Input -->
-                                        <HBox alignItems="End">
-                                            <Input 
-                                                id="chatInput"
-                                                placeholder="{i18n>askQuestion}"
-                                                value="{/chatInput}"
-                                                submit="onSendMessage"
-                                                class="sapUiMediumMarginEnd"
-                                                width="100%"/>
-                                            <Button 
-                                                text="{i18n>send}"
-                                                type="Emphasized"
-                                                icon="sap-icon://paper-plane"
-                                                press="onSendMessage"
-                                                enabled="{= !!${/chatInput}}"/>
-                                        </HBox>
-                                        
-                                        <!-- Quick Questions -->
-                                        <VBox class="sapUiMediumMarginTop">
-                                            <Text text="{i18n>quickQuestions}" class="sapUiSmallMarginBottom"/>
-                                            <HBox wrap="Wrap">
-                                                <Button 
-                                                    text="{i18n>whatIsLiabilityClause}"
-                                                    type="Transparent"
-                                                    press="onQuickQuestion"
-                                                    class="sapUiTinyMarginEnd sapUiTinyMarginBottom"/>
-                                                <Button 
-                                                    text="{i18n>whoAreParties}"
-                                                    type="Transparent"
-                                                    press="onQuickQuestion"
-                                                    class="sapUiTinyMarginEnd sapUiTinyMarginBottom"/>
-                                                <Button 
-                                                    text="{i18n>whatIsTerminationClause}"
-                                                    type="Transparent"
-                                                    press="onQuickQuestion"
-                                                    class="sapUiTinyMarginEnd sapUiTinyMarginBottom"/>
-                                                <Button 
-                                                    text="{i18n>summarizeDocument}"
-                                                    type="Transparent"
-                                                    press="onQuickQuestion"
-                                                    class="sapUiTinyMarginEnd sapUiTinyMarginBottom"/>
-                                            </HBox>
-                                        </VBox>
+                                <HBox id="statisticsContent" class="sapUiMediumMargin" justifyContent="SpaceAround">
+                                    <VBox id="totalActivitiesBox" alignItems="Center" class="sapUiMediumMarginEnd">
+                                        <Text id="totalActivitiesNumber" text="{local>/statistics/totalActivities}" class="sapUiLargeText sapUiTextBold"/>
+                                        <Text id="totalActivitiesLabel" text="Total Activities" class="sapUiSmallText"/>
                                     </VBox>
+                                    <VBox id="completedBox" alignItems="Center" class="sapUiMediumMarginEnd">
+                                        <Text id="completedNumber" text="{local>/statistics/completed}" class="sapUiLargeText sapUiTextBold"/>
+                                        <Text id="completedLabel" text="Completed" class="sapUiSmallText"/>
+                                    </VBox>
+                                    <VBox id="inProgressBox" alignItems="Center" class="sapUiMediumMarginEnd">
+                                        <Text id="inProgressNumber" text="{local>/statistics/inProgress}" class="sapUiLargeText sapUiTextBold"/>
+                                        <Text id="inProgressLabel" text="In Progress" class="sapUiSmallText"/>
+                                    </VBox>
+                                    <VBox id="totalMinutesBox" alignItems="Center">
+                                        <Text id="totalMinutesNumber" text="{local>/statistics/totalMinutes}" class="sapUiLargeText sapUiTextBold"/>
+                                        <Text id="totalMinutesLabel" text="Total Minutes" class="sapUiSmallText"/>
+                                    </VBox>
+                                </HBox>
+                            </content>
+                        </Panel>
+                    </VBox>
+
+                    <!-- Settings Section -->
+                    <VBox id="settingsSection" visible="false" class="sapUiMediumMargin">
+                        <Title id="settingsTitle" text="Settings" level="H2" class="sapUiMediumMarginBottom"/>
+                        <Panel id="settingsPanel" class="sapUiResponsiveMargin">
+                            <content>
+                                <VBox id="settingsContent" class="sapUiMediumMargin">
+                                    <Text id="settingsDescription" text="Configure your legal document analyzer preferences"
+                                          class="sapUiSmallMarginBottom"/>
                                 </VBox>
                             </content>
                         </Panel>
-                        
                     </VBox>
-                </f:content>
-            </f:DynamicPage>
-        </content>
-    </Page>
+                </content>
+            </Page>
+        </tnt:mainContents>
+    </tnt:ToolPage>
 </mvc:View>

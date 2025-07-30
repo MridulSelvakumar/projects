@@ -1,0 +1,155 @@
+<mvc:View
+    controllerName="legal.document.analyzer.ui.controller.DocumentDetail"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns="sap.m">
+    
+    <Page id="page" title="{title}" showNavButton="true" navButtonPress="onNavBack">
+        <content>
+            <f:DynamicPage id="dynamicPage">
+                <f:title>
+                    <f:DynamicPageTitle>
+                        <f:heading>
+                            <Title text="{title}"/>
+                        </f:heading>
+                        <f:actions>
+                            <Button 
+                                text="{i18n>processDocument}" 
+                                type="Emphasized"
+                                icon="sap-icon://process"
+                                press="onProcessDocument"
+                                visible="{= ${status} === 'UPLOADED'}"/>
+                            <Button 
+                                text="{i18n>exportDocument}" 
+                                icon="sap-icon://download"
+                                press="onExportDocument"/>
+                        </f:actions>
+                    </f:DynamicPageTitle>
+                </f:title>
+                
+                <f:content>
+                    <VBox class="sapUiMediumMargin">
+                        
+                        <!-- Document Information -->
+                        <Panel headerText="{i18n>documentInformation}" class="sapUiResponsiveMargin">
+                            <content>
+                                <form:SimpleForm 
+                                    xmlns:form="sap.ui.layout.form"
+                                    editable="false"
+                                    layout="ResponsiveGridLayout"
+                                    labelSpanXL="3"
+                                    labelSpanL="3"
+                                    labelSpanM="3"
+                                    labelSpanS="12"
+                                    adjustLabelSpan="false"
+                                    emptySpanXL="4"
+                                    emptySpanL="4"
+                                    emptySpanM="4"
+                                    emptySpanS="0"
+                                    columnsXL="1"
+                                    columnsL="1"
+                                    columnsM="1"
+                                    singleContainerFullSize="false">
+                                    <form:content>
+                                        <Label text="{i18n>fileName}"/>
+                                        <Text text="{fileName}"/>
+                                        
+                                        <Label text="{i18n>documentType}"/>
+                                        <Text text="{documentType}"/>
+                                        
+                                        <Label text="{i18n>status}"/>
+                                        <ObjectStatus 
+                                            text="{status}"
+                                            state="{path: 'status', formatter: '.formatStatus'}"/>
+                                        
+                                        <Label text="{i18n>fileSize}"/>
+                                        <Text text="{path: 'fileSize', formatter: '.formatFileSize'}"/>
+                                        
+                                        <Label text="{i18n>uploadedBy}"/>
+                                        <Text text="{uploadedBy}"/>
+                                        
+                                        <Label text="{i18n>uploadDate}"/>
+                                        <Text text="{path: 'createdAt', type: 'sap.ui.model.odata.type.DateTimeOffset'}"/>
+                                    </form:content>
+                                </form:SimpleForm>
+                            </content>
+                        </Panel>
+                        
+                        <!-- Document Clauses -->
+                        <Panel headerText="{i18n>extractedClauses}" class="sapUiResponsiveMargin">
+                            <content>
+                                <Table 
+                                    id="clausesTable"
+                                    items="{clauses}"
+                                    growing="true"
+                                    growingThreshold="10">
+                                    <columns>
+                                        <Column>
+                                            <Text text="{i18n>clauseType}"/>
+                                        </Column>
+                                        <Column>
+                                            <Text text="{i18n>title}"/>
+                                        </Column>
+                                        <Column>
+                                            <Text text="{i18n>confidence}"/>
+                                        </Column>
+                                        <Column>
+                                            <Text text="{i18n>content}"/>
+                                        </Column>
+                                    </columns>
+                                    <items>
+                                        <ColumnListItem>
+                                            <cells>
+                                                <Text text="{clauseType}"/>
+                                                <Text text="{title}"/>
+                                                <ProgressIndicator 
+                                                    percentValue="{path: 'confidence', formatter: '.formatConfidencePercent'}"
+                                                    displayValue="{path: 'confidence', formatter: '.formatConfidence'}"
+                                                    width="100px"/>
+                                                <Text text="{content}" maxLines="3"/>
+                                            </cells>
+                                        </ColumnListItem>
+                                    </items>
+                                </Table>
+                            </content>
+                        </Panel>
+                        
+                        <!-- Document Parties -->
+                        <Panel headerText="{i18n>documentParties}" class="sapUiResponsiveMargin">
+                            <content>
+                                <Table 
+                                    id="partiesTable"
+                                    items="{parties}"
+                                    growing="true"
+                                    growingThreshold="10">
+                                    <columns>
+                                        <Column>
+                                            <Text text="{i18n>partyName}"/>
+                                        </Column>
+                                        <Column>
+                                            <Text text="{i18n>role}"/>
+                                        </Column>
+                                        <Column>
+                                            <Text text="{i18n>entityType}"/>
+                                        </Column>
+                                    </columns>
+                                    <items>
+                                        <ColumnListItem>
+                                            <cells>
+                                                <Text text="{name}"/>
+                                                <Text text="{role}"/>
+                                                <Text text="{entityType}"/>
+                                            </cells>
+                                        </ColumnListItem>
+                                    </items>
+                                </Table>
+                            </content>
+                        </Panel>
+                        
+                    </VBox>
+                </f:content>
+            </f:DynamicPage>
+        </content>
+    </Page>
+</mvc:View>

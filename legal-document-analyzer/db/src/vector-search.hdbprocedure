@@ -1,0 +1,117 @@
+-- HANA Cloud Vector Search Procedures for Legal Document Analyzer
+
+-- Semantic Document Search Procedure
+PROCEDURE "SEMANTIC_DOCUMENT_SEARCH" (
+    IN query_vector REAL_VECTOR(384),
+    IN top_k INTEGER DEFAULT 5,
+    IN document_id NVARCHAR(36) DEFAULT NULL
+)
+LANGUAGE SQLSCRIPT
+READS SQL DATA AS
+BEGIN
+    DECLARE similarity_threshold DECIMAL(3,2) DEFAULT 0.7;
+    
+    IF document_id IS NULL THEN
+        -- Search across all documents
+        SELECT 
+            de.DOCUMENT_ID,
+            de.CHUNK_ID,
+            de.CHUNK_TEXT,
+            COSINE_SIMILARITY(de.EMBEDDING_VECTOR, :query_vector) AS SIMILARITY_SCORE,
+            de.CHUNK_INDEX
+        FROM "LEGAL_DOCUMENT_ANALYZER_DOCUMENT_EMBEDDINGS" de
+        WHERE COSINE_SIMILARITY(de.EMBEDDING_VECTOR, :query_vector) >= :similarity_threshold
+        ORDER BY SIMILARITY_SCORE DESC
+        LIMIT :top_k;
+    ELSE
+        -- Search within specific document
+        SELECT 
+            de.DOCUMENT_ID,
+            de.CHUNK_ID,
+            de.CHUNK_TEXT,
+            COSINE_SIMILARITY(de.EMBEDDING_VECTOR, :query_vector) AS SIMILARITY_SCORE,
+            de.CHUNK_INDEX
+        FROM "LEGAL_DOCUMENT_ANALYZER_DOCUMENT_EMBEDDINGS" de
+        WHERE de.DOCUMENT_ID = :document_id
+          AND COSINE_SIMILARITY(de.EMBEDDING_VECTOR, :query_vector) >= :similarity_threshold
+        ORDER BY SIMILARITY_SCORE DESC
+        LIMIT :top_k;
+    END IF;
+END;
+
+-- Semantic Clause Search Procedure
+PROCEDURE "SEMANTIC_CLAUSE_SEARCH" (
+    IN query_vector REAL_VECTOR(384),
+    IN clause_type NVARCHAR(50) DEFAULT NULL,
+    IN top_k INTEGER DEFAULT 5
+)
+LANGUAGE SQLSCRIPT
+READS SQL DATA AS
+BEGIN
+    DECLARE similarity_threshold DECIMAL(3,2) DEFAULT 0.7;
+    
+    IF clause_type IS NULL THEN
+        -- Search across all clause types
+        SELECT 
+            ce.CLAUSE_ID,
+            ce.CLAUSE_TYPE,
+            ce.CLAUSE_TEXT,
+            COSINE_SIMILARITY(ce.EMBEDDING_VECTOR, :query_vector) AS SIMILARITY_SCORE,
+            ce.CONFIDENCE_SCORE
+        FROM "LEGAL_DOCUMENT_ANALYZER_CLAUSE_EMBEDDINGS" ce
+        WHERE COSINE_SIMILARITY(ce.EMBEDDING_VECTOR, :query_vector) >= :similarity_threshold
+        ORDER BY SIMILARITY_SCORE DESC
+        LIMIT :top_k;
+    ELSE
+        -- Search within specific clause type
+        SELECT 
+            ce.CLAUSE_ID,
+            ce.CLAUSE_TYPE,
+            ce.CLAUSE_TEXT,
+            COSINE_SIMILARITY(ce.EMBEDDING_VECTOR, :query_vector) AS SIMILARITY_SCORE,
+            ce.CONFIDENCE_SCORE
+        FROM "LEGAL_DOCUMENT_ANALYZER_CLAUSE_EMBEDDINGS" ce
+        WHERE ce.CLAUSE_TYPE = :clause_type
+          AND COSINE_SIMILARITY(ce.EMBEDDING_VECTOR, :query_vector) >= :similarity_threshold
+        ORDER BY SIMILARITY_SCORE DESC
+        LIMIT :top_k;
+    END IF;
+END;
+
+-- Hybrid Search Procedure (combines document and clause search)
+PROCEDURE "HYBRID_LEGAL_SEARCH" (
+    IN query_vector REAL_VECTOR(384),
+    IN search_type NVARCHAR(20) DEFAULT 'ALL', -- 'DOCUMENTS', 'CLAUSES', 'ALL'
+    IN top_k INTEGER DEFAULT 10
+)
+LANGUAGE SQLSCRIPT
+READS SQL DATA AS
+BEGIN
+    IF search_type = 'DOCUMENTS' OR search_type = 'ALL' THEN
+        -- Document search results
+        SELECT 
+            'DOCUMENT' AS RESULT_TYPE,
+            de.DOCUMENT_ID AS ENTITY_ID,
+            de.CHUNK_ID AS SUB_ENTITY_ID,
+            de.CHUNK_TEXT AS TEXT_CONTENT,
+            COSINE_SIMILARITY(de.EMBEDDING_VECTOR, :query_vector) AS SIMILARITY_SCORE
+        FROM "LEGAL_DOCUMENT_ANALYZER_DOCUMENT_EMBEDDINGS" de
+        WHERE COSINE_SIMILARITY(de.EMBEDDING_VECTOR, :query_vector) >= 0.7
+        ORDER BY SIMILARITY_SCORE DESC
+        LIMIT :top_k;
+    END IF;
+    
+    IF search_type = 'CLAUSES' OR search_type = 'ALL' THEN
+        -- Clause search results
+        SELECT 
+            'CLAUSE' AS RESULT_TYPE,
+            ce.CLAUSE_ID AS ENTITY_ID,
+            ce.CLAUSE_TYPE AS SUB_ENTITY_ID,
+            ce.CLAUSE_TEXT AS TEXT_CONTENT,
+            COSINE_SIMILARITY(ce.EMBEDDING_VECTOR, :query_vector) AS SIMILARITY_SCORE
+        FROM "LEGAL_DOCUMENT_ANALYZER_CLAUSE_EMBEDDINGS" ce
+        WHERE COSINE_SIMILARITY(ce.EMBEDDING_VECTOR, :query_vector) >= 0.7
+        ORDER BY SIMILARITY_SCORE DESC
+        LIMIT :top_k;
+    END IF;
+END;

@@ -1,6 +1,31 @@
 namespace legal.document.analyzer;
 
-using { cuid, managed, Currency, Country } from '@sap/cds/common';
+using { cuid, managed } from '@sap/cds/common';
+
+// User entity - stores user information and sessions
+entity Users : cuid, managed {
+  username        : String(100) not null;
+  email           : String(255) not null;
+  firstName       : String(100);
+  lastName        : String(100);
+  role            : String(50) default 'USER'; // USER, ADMIN, ANALYST
+  isActive        : Boolean default true;
+  lastLogin       : Timestamp;
+
+  // Relationships
+  sessions        : Composition of many UserSessions on sessions.user = $self;
+}
+
+// User sessions for tracking login/logout
+entity UserSessions : cuid {
+  user            : Association to Users not null;
+  sessionToken    : String(255) not null;
+  loginTime       : Timestamp default $now;
+  logoutTime      : Timestamp;
+  ipAddress       : String(45); // IPv6 compatible
+  userAgent       : String(500);
+  isActive        : Boolean default true;
+}
 
 // Document entity - stores uploaded legal documents
 entity Documents : cuid, managed {
@@ -8,7 +33,8 @@ entity Documents : cuid, managed {
   fileName        : String(255) not null;
   fileSize        : Integer;
   mimeType        : String(100);
-  uploadedBy      : String(100);
+  user            : Association to Users;
+  uploadedBy      : String(100); // Keep for backward compatibility
   documentType    : String(50); // Contract, NDA, Agreement, etc.
   status          : String(20) default 'UPLOADED'; // UPLOADED, PROCESSING, PROCESSED, ERROR
   content         : LargeBinary; // Store the actual file content
@@ -32,7 +58,7 @@ entity Clauses : cuid, managed {
   startPosition   : Integer; // Position in original document
   endPosition     : Integer;
   confidence      : Decimal(3,2); // AI confidence score 0.00-1.00
-  tags            : many String(50); // Additional tags for categorization
+  tags            : array of String(50); // Additional tags for categorization
   
   // Vector embeddings for this clause
   embeddings      : Composition of many ClauseEmbeddings on embeddings.clause = $self;
@@ -48,7 +74,7 @@ entity Parties : cuid, managed {
   contactInfo     : LargeString;
   
   // Relationships to clauses where this party is mentioned
-  clauseReferences : Association to many Clauses;
+  clauseReferences : Association to many Clauses on clauseReferences.document = document;
 }
 
 // Document-level embeddings for semantic search
@@ -74,7 +100,7 @@ entity DocumentQueries : cuid, managed {
   document        : Association to Documents not null;
   query           : LargeString not null;
   response        : LargeString;
-  retrievedClauses : many Association to Clauses; // Clauses used for RAG
+  retrievedClauses : Association to many Clauses on retrievedClauses.document = document; // Clauses used for RAG
   confidence      : Decimal(3,2); // AI response confidence
   responseTime    : Integer; // Response time in milliseconds
   feedback        : String(20); // HELPFUL, NOT_HELPFUL, PARTIALLY_HELPFUL

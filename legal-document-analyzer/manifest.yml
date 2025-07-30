@@ -50,3 +50,65 @@ applications:
       - legal-document-analyzer-xsuaa
     routes:
       - route: legal-document-analyzer-ui.cfapps.sap.hana.ondemand.com
+
+  # Database Deployer
+  - name: legal-document-analyzer-db-deployer
+    path: .
+    buildpacks:
+      - nodejs_buildpack
+    memory: 512M
+    disk_quota: 1G
+    instances: 1
+    no-route: true
+    health-check-type: process
+    services:
+      - legal-document-analyzer-hana
+    env:
+      NODE_ENV: production
+      TARGET_CONTAINER: legal-document-analyzer-hana
+    command: npx cds deploy --to hana:legal-document-analyzer-hana --auto-undeploy
+
+---
+# Service Definitions
+services:
+  # HANA Cloud Database
+  - name: legal-document-analyzer-hana
+    service: hana
+    plan: hdi-shared
+    parameters:
+      config:
+        schema: LEGAL_DOCUMENT_ANALYZER
+
+  # Destination Service
+  - name: legal-document-analyzer-destination
+    service: destination
+    plan: lite
+
+  # Connectivity Service
+  - name: legal-document-analyzer-connectivity
+    service: connectivity
+    plan: lite
+
+  # XSUAA Authentication
+  - name: legal-document-analyzer-xsuaa
+    service: xsuaa
+    plan: application
+    parameters:
+      config:
+        xsappname: legal-document-analyzer
+        tenant-mode: dedicated
+        scopes:
+          - name: $XSAPPNAME.Admin
+            description: Admin access to legal document analyzer
+          - name: $XSAPPNAME.User
+            description: User access to legal document analyzer
+        role-templates:
+          - name: Admin
+            description: Administrator role
+            scope-references:
+              - $XSAPPNAME.Admin
+              - $XSAPPNAME.User
+          - name: User
+            description: User role
+            scope-references:
+              - $XSAPPNAME.User

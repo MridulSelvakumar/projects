@@ -1,0 +1,13 @@
+{
+  "Name": "legal-document-ai-service",
+  "Type": "HTTP",
+  "URL": "https://legal-document-ai-${space}.cfapps.sap.hana.ondemand.com",
+  "Authentication": "NoAuthentication",
+  "ProxyType": "Internet",
+  "Description": "AI microservice for legal document analysis",
+  "HTML5.DynamicDestination": "true",
+  "HTML5.Timeout": "60000",
+  "WebIDEEnabled": "true",
+  "WebIDEUsage": "odata_gen",
+  "sap-client": "100"
+}

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal Document Analyzer</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 60'><defs><linearGradient id='sapFaviconGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%23007cc3'/><stop offset='100%25' style='stop-color:%23005ba1'/></linearGradient></defs><polygon points='0,0 100,0 85,60 0,60' fill='url(%23sapFaviconGrad)'/><text x='42' y='40' text-anchor='middle' fill='white' font-family='Arial,sans-serif' font-weight='bold' font-size='18' letter-spacing='1px'>SAP</text></svg>"
+    
+    <!-- SAP UI5 Bootstrap -->
+    <script
+        id="sap-ui-bootstrap"
+        src="https://ui5.sap.com/1.120.0/resources/sap-ui-core.js"
+        data-sap-ui-theme="sap_horizon"
+        data-sap-ui-libs="sap.m,sap.f,sap.ui.core,sap.tnt"
+        data-sap-ui-compatVersion="edge"
+        data-sap-ui-async="true"
+        data-sap-ui-frameOptions="trusted">
+    </script>
+    
+    <style>
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: Arial, sans-serif;
+            color: #0070f3;
+        }
+    </style>
+</head>
+<body class="sapUiBody">
+    <div id="content"></div>
+    
+    <div class="loading" id="loading">
+        <div>Loading Legal Document Analyzer...</div>
+    </div>
+    
+    <script>
+        sap.ui.getCore().attachInit(function () {
+            // Hide loading message
+            document.getElementById('loading').style.display = 'none';
+
+            // Create a simple working UI
+            sap.ui.require([
+                "sap/m/Page",
+                "sap/m/Panel",
+                "sap/m/VBox",
+                "sap/m/HBox",
+                "sap/m/Title",
+                "sap/m/Text",
+                "sap/m/Button",
+                "sap/ui/core/Icon"
+            ], function(Page, Panel, VBox, HBox, Title, Text, Button, Icon) {
+
+                // Create a simple page
+                var oPage = new Page({
+                    title: "Legal Document Analyzer",
+                    content: [
+                        // Header with SAP logo
+                        new HBox({
+                            alignItems: "Center",
+                            class: "sapUiMediumMargin",
+                            items: [
+                                new Icon({
+                                    src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 80'><defs><linearGradient id='sapHeaderGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%23007cc3'/><stop offset='100%25' style='stop-color:%23005ba1'/></linearGradient></defs><polygon points='0,0 200,0 170,80 0,80' fill='url(%23sapHeaderGrad)'/><text x='85' y='52' text-anchor='middle' fill='white' font-family='Arial,sans-serif' font-weight='bold' font-size='32' letter-spacing='2px'>SAP</text></svg>",
+                                    size: "3rem",
+                                    class: "sapUiMediumMarginEnd"
+                                }),
+                                new Title({
+                                    text: "Legal Document Analyzer",
+                                    level: "H1"
+                                })
+                            ]
+                        }),
+                        // Dashboard Page
+                        new Page("dashboardPage", {
+                            title: "Daily Activities",
+                            content: [
+                                new VBox({
+                                    class: "sapUiMediumMargin",
+                                    items: [
+                                        // Simple Activity List
+                                        new Panel({
+                                            headerText: "Daily Activities",
+                                            class: "sapUiResponsiveMargin",
+                                            content: [
+                                                new VBox({
+                                                    class: "sapUiMediumMargin",
+                                                    items: [
+                                                        new HBox({
+                                                            class: "sapUiSmallMarginBottom",
+                                                            items: [
+                                                                new Text({text: "Contract Review & Analysis", class: "sapUiMediumMarginEnd"}),
+                                                                new ObjectStatus({text: "High Priority", state: "Error", class: "sapUiTinyMarginEnd"}),
+                                                                new ObjectStatus({text: "Completed", state: "Success"})
+                                                            ]
+                                                        }),
+                                                        new HBox({
+                                                            class: "sapUiSmallMarginBottom",
+                                                            items: [
+                                                                new Text({text: "Legal Document Training", class: "sapUiMediumMarginEnd"}),
+                                                                new ObjectStatus({text: "High Priority", state: "Error", class: "sapUiTinyMarginEnd"}),
+                                                                new ObjectStatus({text: "In Progress", state: "Warning"})
+                                                            ]
+                                                        }),
+                                                        new HBox({
+                                                            class: "sapUiSmallMarginBottom",
+                                                            items: [
+                                                                new Text({text: "Team Introduction Meeting", class: "sapUiMediumMarginEnd"}),
+                                                                new ObjectStatus({text: "Medium Priority", state: "Warning", class: "sapUiTinyMarginEnd"}),
+                                                                new ObjectStatus({text: "Planned", state: "None"})
+                                                            ]
+                                                        })
+                                                    ]
+                                                })
+                                            ]
+                                        }),
+
+                                        // Activity Statistics
+                                        new Panel({
+                                            headerText: "Activity Statistics",
+                                            class: "sapUiResponsiveMargin",
+                                            content: [
+                                                new HBox({
+                                                    class: "sapUiMediumMargin",
+                                                    items: [
+                                                        new VBox({
+                                                            alignItems: "Center",
+                                                            class: "sapUiMediumMarginEnd",
+                                                            items: [
+                                                                new Title({text: "3", level: "H1"}),
+                                                                new Text({text: "Total Activities"})
+                                                            ]
+                                                        }),
+                                                        new VBox({
+                                                            alignItems: "Center",
+                                                            class: "sapUiMediumMarginEnd",
+                                                            items: [
+                                                                new Title({text: "1", level: "H1"}),
+                                                                new Text({text: "Completed"})
+                                                            ]
+                                                        }),
+                                                        new VBox({
+                                                            alignItems: "Center",
+                                                            class: "sapUiMediumMarginEnd",
+                                                            items: [
+                                                                new Title({text: "1", level: "H1"}),
+                                                                new Text({text: "In Progress"})
+                                                            ]
+                                                        }),
+                                                        new VBox({
+                                                            alignItems: "Center",
+                                                            items: [
+                                                                new Title({text: "360", level: "H1"}),
+                                                                new Text({text: "Total Minutes"})
+                                                            ]
+                                                        })
+                                                    ]
+                                                })
+                                                            type: "Emphasized",
+                                                            class: "sapUiMediumMarginTop",
+                                                            press: function() {
+                                                                fetch('/legal-documents/DocumentQueries/askQuestion', {
+                                                                    method: 'POST',
+                                                                    headers: {
+                                                                        'Content-Type': 'application/json'
+                                                                    },
+                                                                    body: JSON.stringify({
+                                                                        question: "What is this application about?",
+                                                                        queryType: "GENERAL"
+                                                                    })
+                                                                })
+                                                                .then(response => response.json())
+                                                                .then(data => {
+                                                                    MessageToast.show("AI Response: " + data.response);
+                                                                })
+                                                                .catch(error => {
+                                                                    MessageToast.show("Error: " + error.message);
+                                                                });
+                                                            }
+                                                        })
+                                                    ]
+                                                })
+                                            ]
+                                        }),
+
+                                        new Panel({
+                                            headerText: "Key Features",
+                                            class: "sapUiResponsiveMargin",
+                                            content: [
+                                                new VBox({
+                                                    class: "sapUiMediumMargin",
+                                                    items: [
+                                                        new Text({ text: "• Document Upload (PDF, DOCX, TXT)" }),
+                                                        new Text({ text: "• AI-Powered Q&A with RAG" }),
+                                                        new Text({ text: "• Legal Clause Extraction" }),
+                                                        new Text({ text: "• Risk Assessment & Analytics" }),
+                                                        new Text({ text: "• Enterprise SAP Fiori UI" })
+                                                    ]
+                                                })
+                                            ]
+                                        })
+                                    ]
+                                })
+                            ]
+                        }),
+
+                        // Upload Page
+                        new Page("uploadPage", {
+                            title: "Document Upload",
+                            visible: false,
+                            content: [
+                                new VBox({
+                                    class: "sapUiMediumMargin",
+                                    items: [
+                                        new Panel({
+                                            headerText: "Upload Legal Documents",
+                                            class: "sapUiResponsiveMargin",
+                                            content: [
+                                                new VBox({
+                                                    class: "sapUiMediumMargin",
+                                                    items: [
+                                                        new Text({
+                                                            text: "Upload your legal documents (PDF, DOCX, TXT) for AI-powered analysis."
+                                                        }),
+                                                        new Button({
+                                                            text: "Choose File",
+                                                            icon: "sap-icon://upload",
+                                                            class: "sapUiMediumMarginTop",
+                                                            press: function() {
+                                                                MessageToast.show("File upload functionality would be implemented here");
+                                                            }
+                                                        })
+                                                    ]
+                                                })
+                                            ]
+                                        })
+                                    ]
+                                })
+                            ]
+                        }),
+
+                        // AI Assistant Page
+                        new Page("assistantPage", {
+                            title: "AI Assistant",
+                            visible: false,
+                            content: [
+                                new VBox({
+                                    class: "sapUiMediumMargin",
+                                    items: [
+                                        new Panel({
+                                            headerText: "AI-Powered Legal Assistant",
+                                            class: "sapUiResponsiveMargin",
+                                            content: [
+                                                new VBox({
+                                                    class: "sapUiMediumMargin",
+                                                    items: [
+                                                        new Text({
+                                                            text: "Ask questions about your legal documents using advanced AI with RAG (Retrieval-Augmented Generation)."
+                                                        }),
+                                                        new Button({
+                                                            text: "Ask AI Question",
+                                                            icon: "sap-icon://discussion-2",
+                                                            type: "Emphasized",
+                                                            class: "sapUiMediumMarginTop",
+                                                            press: function() {
+                                                                fetch('/legal-documents/DocumentQueries/askQuestion', {
+                                                                    method: 'POST',
+                                                                    headers: {
+                                                                        'Content-Type': 'application/json'
+                                                                    },
+                                                                    body: JSON.stringify({
+                                                                        question: "What are the key liability clauses in my contract?",
+                                                                        queryType: "CLAUSE_ANALYSIS"
+                                                                    })
+                                                                })
+                                                                .then(response => response.json())
+                                                                .then(data => {
+                                                                    MessageToast.show("AI Response: " + data.response);
+                                                                })
+                                                                .catch(error => {
+                                                                    MessageToast.show("Error: " + error.message);
+                                                                });
+                                                            }
+                                                        })
+                                                    ]
+                                                })
+                                            ]
+                                        })
+                                    ]
+                                })
+                            ]
+                        }),
+
+                        // Analytics Page
+                        new Page("analyticsPage", {
+                            title: "Analytics Dashboard",
+                            visible: false,
+                            content: [
+                                new VBox({
+                                    class: "sapUiMediumMargin",
+                                    items: [
+                                        new Panel({
+                                            headerText: "Document Analytics",
+                                            class: "sapUiResponsiveMargin",
+                                            content: [
+                                                new VBox({
+                                                    class: "sapUiMediumMargin",
+                                                    items: [
+                                                        new Text({
+                                                            text: "View comprehensive analytics and insights from your legal document analysis."
+                                                        }),
+                                                        new Button({
+                                                            text: "View Analytics",
+                                                            icon: "sap-icon://pie-chart",
+                                                            class: "sapUiMediumMarginTop",
+                                                            press: function() {
+                                                                MessageToast.show("Analytics dashboard would display charts and insights here");
+                                                            }
+                                                        })
+                                                    ]
+                                                })
+                                            ]
+                                        })
+                                    ]
+                                })
+                            ]
+                        }),
+
+                        // Documents Page
+                        new Page("documentsPage", {
+                            title: "Document Library",
+                            visible: false,
+                            content: [
+                                new VBox({
+                                    class: "sapUiMediumMargin",
+                                    items: [
+                                        new Panel({
+                                            headerText: "Document Library",
+                                            class: "sapUiResponsiveMargin",
+                                            content: [
+                                                new VBox({
+                                                    class: "sapUiMediumMargin",
+                                                    items: [
+                                                        new Text({
+                                                            text: "Browse and manage your uploaded legal documents."
+                                                        }),
+                                                        new Button({
+                                                            text: "Load Documents",
+                                                            icon: "sap-icon://documents",
+                                                            class: "sapUiMediumMarginTop",
+                                                            press: function() {
+                                                                fetch('/legal-documents/Documents')
+                                                                    .then(response => response.json())
+                                                                    .then(data => {
+                                                                        MessageToast.show("Found " + (data.value ? data.value.length : 0) + " documents");
+                                                                    })
+                                                                    .catch(error => {
+                                                                        MessageToast.show("Error loading documents: " + error.message);
+                                                                    });
+                                                            }
+                                                        })
+                                                    ]
+                                                })
+                                            ]
+                                        })
+                                    ]
+                                })
+                            ]
+                        })
+                    ]
+                });
+
+                // Navigation function
+                window.showSection = function(sectionKey) {
+                    // Hide all pages
+                    sap.ui.getCore().byId("dashboardPage").setVisible(false);
+                    sap.ui.getCore().byId("uploadPage").setVisible(false);
+                    sap.ui.getCore().byId("assistantPage").setVisible(false);
+                    sap.ui.getCore().byId("analyticsPage").setVisible(false);
+                    sap.ui.getCore().byId("documentsPage").setVisible(false);
+
+                    // Show selected page
+                    switch(sectionKey) {
+                        case "dashboard":
+                        case "activities":
+                            sap.ui.getCore().byId("dashboardPage").setVisible(true);
+                            break;
+                        case "assistant":
+                            sap.ui.getCore().byId("assistantPage").setVisible(true);
+                            break;
+                        case "analytics":
+                            sap.ui.getCore().byId("analyticsPage").setVisible(true);
+                            break;
+                        case "settings":
+                            MessageToast.show("Settings functionality coming soon!");
+                            sap.ui.getCore().byId("dashboardPage").setVisible(true);
+                            break;
+                        default:
+                            sap.ui.getCore().byId("dashboardPage").setVisible(true);
+                    }
+
+                    MessageToast.show("Navigated to " + sectionKey + " section");
+                };
+
+                oToolPage.placeAt("content");
+
+                // Show dashboard page by default
+                showSection("dashboard");
+            });
+        });
+    </script>
+</body>
+</html>

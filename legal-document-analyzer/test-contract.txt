@@ -1,0 +1,30 @@
+LEGAL SERVICE AGREEMENT
+
+This Legal Service Agreement ("Agreement") is entered into on [Date] between [Client Name] ("Client") and [Law Firm Name] ("Attorney").
+
+1. SCOPE OF SERVICES
+Attorney agrees to provide legal services to Client including but not limited to:
+- Contract review and analysis
+- Legal consultation and advice
+- Document preparation and review
+
+2. LIABILITY CLAUSE
+Attorney's liability for any claims arising from this agreement shall be limited to the total fees paid by Client under this Agreement. In no event shall Attorney be liable for any indirect, incidental, or consequential damages.
+
+3. TERMINATION PROVISIONS
+Either party may terminate this Agreement with thirty (30) days written notice. Upon termination, Client shall pay for all services rendered up to the date of termination.
+
+4. CONFIDENTIALITY
+Attorney agrees to maintain the confidentiality of all Client information and shall not disclose any confidential information without Client's written consent.
+
+5. PAYMENT TERMS
+Client agrees to pay Attorney's fees within thirty (30) days of invoice date. Late payments may incur interest charges at the rate of 1.5% per month.
+
+6. GOVERNING LAW
+This Agreement shall be governed by the laws of [State/Province].
+
+IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written above.
+
+[Client Signature]                    [Attorney Signature]
+[Client Name]                         [Attorney Name]
+[Date]                               [Date]

@@ -20,25 +20,54 @@
   },
   "devDependencies": {
     "@cap-js/sqlite": "^2",
-    "@cap-js/cds-types": "^0.13.0"
+    "@cap-js/cds-types": "^0.13.0",
+    "chai": "^4.3.10",
+    "mocha": "^10.2.0",
+    "supertest": "^6.3.3"
   },
   "scripts": {
     "start": "cds-serve",
     "watch": "cds watch",
     "build": "cds build",
-    "deploy": "cds deploy"
+    "deploy": "cds deploy",
+    "test": "mocha test/**/*.test.js --timeout 10000",
+    "test:integration": "mocha test/**/*.integration.test.js --timeout 30000",
+    "test:ai": "cd ai-service && python -m pytest test_app.py -v"
   },
   "cds": {
     "requires": {
       "db": {
-        "kind": "hana-cloud"
+        "kind": "sqlite",
+        "[production]": {
+          "kind": "hana-cloud",
+          "credentials": {
+            "host": "${env:HANA_HOST}",
+            "port": "${env:HANA_PORT}",
+            "user": "${env:HANA_USER}",
+            "password": "${env:HANA_PASSWORD}",
+            "database": "${env:HANA_DATABASE}",
+            "schema": "${env:HANA_SCHEMA}",
+            "encrypt": true,
+            "sslValidateCertificate": false
+          }
+        }
       },
-      "ai-service": {
-        "kind": "rest",
-        "credentials": {
-          "url": "http://localhost:5000"
+      "vector-db": {
+        "kind": "hana-cloud-vector",
+        "[development]": {
+          "kind": "sqlite-vector"
         }
       }
+    },
+    "folders": {
+      "app": "app/"
+    },
+    "serve": {
+      "index": true
+    },
+    "hana": {
+      "deploy-format": "hdbtable",
+      "syntax": "hdi"
     }
   }
 }

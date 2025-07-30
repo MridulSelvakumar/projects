@@ -51,6 +51,7 @@
         "sap.m": {},
         "sap.ui.core": {},
         "sap.f": {},
+        "sap.tnt": {},
         "sap.suite.ui.commons": {},
         "sap.ui.comp": {},
         "sap.ui.generic.app": {},

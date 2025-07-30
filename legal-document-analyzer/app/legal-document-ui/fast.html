@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal Document Analyzer</title>
+    
+    <!-- SAP UI5 Bootstrap -->
+    <script
+        id="sap-ui-bootstrap"
+        src="https://ui5.sap.com/1.120.0/resources/sap-ui-core.js"
+        data-sap-ui-theme="sap_horizon"
+        data-sap-ui-libs="sap.m"
+        data-sap-ui-compatVersion="edge"
+        data-sap-ui-async="true">
+    </script>
+    
+    <style>
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: Arial, sans-serif;
+            color: #0070f3;
+        }
+    </style>
+</head>
+<body class="sapUiBody">
+    <div id="content"></div>
+    
+    <div class="loading" id="loading">
+        <div>Loading Legal Document Analyzer...</div>
+    </div>
+    
+    <script>
+        sap.ui.getCore().attachInit(function () {
+            // Hide loading message
+            document.getElementById('loading').style.display = 'none';
+
+            // Create a simple working UI
+            sap.ui.require([
+                "sap/m/Page",
+                "sap/m/Panel", 
+                "sap/m/VBox",
+                "sap/m/HBox",
+                "sap/m/Title",
+                "sap/m/Text",
+                "sap/m/Button",
+                "sap/ui/core/Icon"
+            ], function(Page, Panel, VBox, HBox, Title, Text, Button, Icon) {
+                
+                // Create a simple page
+                var oPage = new Page({
+                    title: "Legal Document Analyzer",
+                    content: [
+                        // Header with SAP logo
+                        new HBox({
+                            alignItems: "Center",
+                            class: "sapUiMediumMargin",
+                            items: [
+                                new Icon({
+                                    src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 80'><defs><linearGradient id='sapHeaderGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%23007cc3'/><stop offset='100%25' style='stop-color:%23005ba1'/></linearGradient></defs><polygon points='0,0 200,0 170,80 0,80' fill='url(%23sapHeaderGrad)'/><text x='85' y='52' text-anchor='middle' fill='white' font-family='Arial,sans-serif' font-weight='bold' font-size='32' letter-spacing='2px'>SAP</text></svg>",
+                                    size: "3rem",
+                                    class: "sapUiMediumMarginEnd"
+                                }),
+                                new Title({
+                                    text: "Legal Document Analyzer",
+                                    level: "H1"
+                                })
+                            ]
+                        }),
+                        
+                        // Main content
+                        new Panel({
+                            headerText: "Daily Activities",
+                            class: "sapUiResponsiveMargin",
+                            content: [
+                                new VBox({
+                                    class: "sapUiMediumMargin",
+                                    items: [
+                                        new Text({text: "• Contract Review & Analysis - Completed"}),
+                                        new Text({text: "• Legal Document Training - In Progress"}),
+                                        new Text({text: "• Team Introduction Meeting - Planned"})
+                                    ]
+                                })
+                            ]
+                        }),
+                        
+                        new Panel({
+                            headerText: "Activity Statistics", 
+                            class: "sapUiResponsiveMargin",
+                            content: [
+                                new HBox({
+                                    class: "sapUiMediumMargin",
+                                    items: [
+                                        new VBox({
+                                            alignItems: "Center",
+                                            class: "sapUiMediumMarginEnd",
+                                            items: [
+                                                new Title({text: "3", level: "H2"}),
+                                                new Text({text: "Total Activities"})
+                                            ]
+                                        }),
+                                        new VBox({
+                                            alignItems: "Center",
+                                            items: [
+                                                new Title({text: "360", level: "H2"}),
+                                                new Text({text: "Total Minutes"})
+                                            ]
+                                        })
+                                    ]
+                                })
+                            ]
+                        })
+                    ]
+                });
+
+                oPage.placeAt("content");
+            });
+        });
+    </script>
+</body>
+</html>
