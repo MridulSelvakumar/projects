@@ -1,0 +1,1 @@
+using LegalDocumentService as service from '../../srv/legal-document-service';

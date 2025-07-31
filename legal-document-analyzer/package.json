@@ -6,33 +6,40 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "@sap/cds": "^9",
-    "express": "^4",
     "@cap-js/hana": "^2",
-    "multer": "^1.4.5-lts.1",
+    "@sap/cds": "^9",
     "axios": "^1.6.0",
-    "pdf-parse": "^1.1.1",
+    "dotenv": "^17.2.1",
+    "express": "^4",
+    "http-proxy-middleware": "^3.0.5",
     "mammoth": "^1.6.0",
+    "multer": "^1.4.5-lts.1",
+    "pdf-parse": "^1.1.1",
     "uuid": "^9.0.1"
   },
   "engines": {
     "node": ">=20"
   },
   "devDependencies": {
-    "@cap-js/sqlite": "^2",
     "@cap-js/cds-types": "^0.13.0",
+    "@cap-js/sqlite": "^2",
     "chai": "^4.3.10",
     "mocha": "^10.2.0",
-    "supertest": "^6.3.3"
+    "supertest": "^6.3.3",
+    "@sap/cds-dk": "^9",
+    "rimraf": "^5.0.5",
+    "mbt": "^1.2.29"
   },
   "scripts": {
     "start": "cds-serve",
     "watch": "cds watch",
-    "build": "cds build",
-    "deploy": "cds deploy",
+    "build": "rimraf resources mta_archives && mbt build --mtar archive",
+    "deploy": "cf deploy mta_archives/archive.mtar --retries 1",
     "test": "mocha test/**/*.test.js --timeout 10000",
     "test:integration": "mocha test/**/*.integration.test.js --timeout 30000",
-    "test:ai": "cd ai-service && python -m pytest test_app.py -v"
+    "test:ai": "cd ai-service && python -m pytest test_app.py -v",
+    "watch-project1": "cds watch --open project1/webapp/index.html?sap-ui-xx-viewCache=false",
+    "undeploy": "cf undeploy legal-document-analyzer --delete-services --delete-service-keys --delete-service-brokers"
   },
   "cds": {
     "requires": {

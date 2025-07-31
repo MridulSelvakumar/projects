@@ -2,166 +2,191 @@ _schema-version: "3.1"
 ID: legal-document-analyzer
 description: AI-Powered Legal Document Analyzer
 version: 1.0.0
-
+modules:
+- name: legal-document-analyzer-srv
+  type: nodejs
+  path: gen/srv
+  requires:
+  - name: legal-document-analyzer-hana
+  - name: legal-document-analyzer-destination
+  - name: legal-document-analyzer-connectivity
+  - name: legal-document-analyzer-xsuaa
+  provides:
+  - name: srv-api
+    properties:
+      srv-url: ${default-url}
+  parameters:
+    buildpack: nodejs_buildpack
+    disk-quota: 1G
+    memory: 512M
+  build-parameters:
+    builder: npm-ci
+- name: legal-document-analyzer-db-deployer
+  type: hdb
+  path: gen/db
+  requires:
+  - name: legal-document-analyzer-hana
+  parameters:
+    buildpack: nodejs_buildpack
+    disk-quota: 1G
+    memory: 256M
+- name: legal-document-analyzer-ai
+  type: python
+  path: ai-service
+  provides:
+  - name: ai-api
+    properties:
+      ai-url: ${default-url}
+  parameters:
+    buildpack: python_buildpack
+    disk-quota: 2G
+    memory: 1G
+  build-parameters:
+    builder: custom
+    commands:
+    - pip install --upgrade pip setuptools wheel
+    - pip install -r requirements.txt
+- name: legal-document-analyzer-ui
+  type: html5
+  path: app/legal-document-ui
+  requires:
+  - name: srv-api
+  - name: legal-document-analyzer-destination
+    group: destinations
+    properties:
+      forwardAuthToken: true
+      name: legal-document-analyzer-srv
+      url: ${srv-api/srv-url}
+  build-parameters:
+    build-result: .
+    builder: custom
+    commands:
+    - echo "Static files ready for deployment"
+    supported-platforms: []
+- name: legal-document-analyzer-app-content
+  type: com.sap.application.content
+  path: .
+  requires:
+  - name: legal-document-analyzer-repo-host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+    - artifacts:
+      - project1.zip
+      name: project1
+      target-path: resources/
+- name: project1
+  type: html5
+  path: app/project1
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+resources:
+- name: legal-document-analyzer-hana
+  type: com.sap.xs.hana
+  parameters:
+    config:
+      schema: LEGAL_DOCUMENT_ANALYZER
+    service: hana
+    service-plan: hdi-shared
+- name: legal-document-analyzer-destination
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      HTML5Runtime_enabled: false
+      init_data:
+        instance:
+          destinations:
+          - Authentication: NoAuthentication
+            Description: Legal Document Analyzer Backend Service
+            HTML5.DynamicDestination: true
+            HTML5.ForwardAuthToken: true
+            Name: legal-document-analyzer-srv
+            ProxyType: Internet
+            Type: HTTP
+            URL: ~{srv-api/srv-url}
+          - Authentication: NoAuthentication
+            Description: AI Microservice
+            Name: legal-document-analyzer-ai
+            ProxyType: Internet
+            Type: HTTP
+            URL: ~{ai-api/ai-url}
+          - Authentication: NoAuthentication
+            Name: ui5
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://ui5.sap.com
+          - Authentication: NoAuthentication
+            HTML5.DynamicDestination: true
+            HTML5.ForwardAuthToken: true
+            Name: legal-document-analyzer-srv-api
+            ProxyType: Internet
+            Type: HTTP
+            URL: ~{srv-api/srv-url}
+          existing_destinations_policy: update
+    service: destination
+    service-plan: lite
+  requires:
+  - name: srv-api
+  - name: ai-api
+- name: legal-document-analyzer-connectivity
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: connectivity
+    service-plan: lite
+- name: legal-document-analyzer-xsuaa
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      role-templates:
+      - description: View legal documents
+        name: DocumentViewer
+        scope-references:
+        - $XSAPPNAME.DocumentRead
+      - description: Edit legal documents
+        name: DocumentEditor
+        scope-references:
+        - $XSAPPNAME.DocumentRead
+        - $XSAPPNAME.DocumentWrite
+        - $XSAPPNAME.AIQuery
+      - description: Full access to legal documents
+        name: DocumentAdmin
+        scope-references:
+        - $XSAPPNAME.DocumentRead
+        - $XSAPPNAME.DocumentWrite
+        - $XSAPPNAME.DocumentDelete
+        - $XSAPPNAME.AIQuery
+      scopes:
+      - description: Read legal documents
+        name: $XSAPPNAME.DocumentRead
+      - description: Upload and modify legal documents
+        name: $XSAPPNAME.DocumentWrite
+      - description: Delete legal documents
+        name: $XSAPPNAME.DocumentDelete
+      - description: Query AI services
+        name: $XSAPPNAME.AIQuery
+      tenant-mode: dedicated
+      xsappname: legal-document-analyzer-${org}-${space}
+    service: xsuaa
+    service-plan: application
+- name: legal-document-analyzer-repo-host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-name: legal-document-analyzer-html5-service
+    service-plan: app-host
 parameters:
+  deploy_mode: html5-repo
   enable-parallel-deployments: true
-
 build-parameters:
   before-all:
-    - builder: custom
-      commands:
-        - npm ci
-        - npx cds build --production
-
-modules:
-  # CAP Backend Service
-  - name: legal-document-analyzer-srv
-    type: nodejs
-    path: gen/srv
-    parameters:
-      buildpack: nodejs_buildpack
-      memory: 512M
-      disk-quota: 1G
-    build-parameters:
-      builder: npm-ci
-    provides:
-      - name: srv-api
-        properties:
-          srv-url: ${default-url}
-    requires:
-      - name: legal-document-analyzer-hana
-      - name: legal-document-analyzer-destination
-      - name: legal-document-analyzer-connectivity
-      - name: legal-document-analyzer-xsuaa
-
-  # Database Deployer
-  - name: legal-document-analyzer-db-deployer
-    type: hdb
-    path: gen/db
-    parameters:
-      buildpack: nodejs_buildpack
-      memory: 256M
-      disk-quota: 1G
-    requires:
-      - name: legal-document-analyzer-hana
-
-  # AI Python Microservice
-  - name: legal-document-analyzer-ai
-    type: python
-    path: ai-service
-    parameters:
-      buildpack: python_buildpack
-      memory: 1G
-      disk-quota: 2G
-    build-parameters:
-      builder: custom
-      commands:
-        - pip install --upgrade pip setuptools wheel
-        - pip install -r requirements.txt
-    provides:
-      - name: ai-api
-        properties:
-          ai-url: ${default-url}
-
-  # Fiori Frontend
-  - name: legal-document-analyzer-ui
-    type: html5
-    path: app/legal-document-ui
-    build-parameters:
-      build-result: .
-      builder: custom
-      commands:
-        - echo "Static files ready for deployment"
-      supported-platforms: []
-    requires:
-      - name: srv-api
-      - name: legal-document-analyzer-destination
-        group: destinations
-        properties:
-          name: legal-document-analyzer-srv
-          url: ${srv-api/srv-url}
-          forwardAuthToken: true
-
-resources:
-  # HANA Cloud Database
-  - name: legal-document-analyzer-hana
-    type: com.sap.xs.hana
-    parameters:
-      service: hana
-      service-plan: hdi-shared
-      config:
-        schema: LEGAL_DOCUMENT_ANALYZER
-
-  # Destination Service
-  - name: legal-document-analyzer-destination
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: destination
-      service-plan: lite
-      config:
-        HTML5Runtime_enabled: true
-        init_data:
-          instance:
-            destinations:
-              - Name: legal-document-analyzer-srv
-                Description: Legal Document Analyzer Backend Service
-                URL: ~{srv-api/srv-url}
-                Type: HTTP
-                ProxyType: Internet
-                Authentication: NoAuthentication
-                HTML5.DynamicDestination: true
-                HTML5.ForwardAuthToken: true
-              - Name: legal-document-analyzer-ai
-                Description: AI Microservice
-                URL: ~{ai-api/ai-url}
-                Type: HTTP
-                ProxyType: Internet
-                Authentication: NoAuthentication
-            existing_destinations_policy: update
-    requires:
-      - name: srv-api
-      - name: ai-api
-
-  # Connectivity Service
-  - name: legal-document-analyzer-connectivity
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: connectivity
-      service-plan: lite
-
-  # XSUAA Authentication
-  - name: legal-document-analyzer-xsuaa
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: xsuaa
-      service-plan: application
-      config:
-        xsappname: legal-document-analyzer-${org}-${space}
-        tenant-mode: dedicated
-        scopes:
-          - name: $XSAPPNAME.DocumentRead
-            description: Read legal documents
-          - name: $XSAPPNAME.DocumentWrite
-            description: Upload and modify legal documents
-          - name: $XSAPPNAME.DocumentDelete
-            description: Delete legal documents
-          - name: $XSAPPNAME.AIQuery
-            description: Query AI services
-        role-templates:
-          - name: DocumentViewer
-            description: View legal documents
-            scope-references:
-              - $XSAPPNAME.DocumentRead
-          - name: DocumentEditor
-            description: Edit legal documents
-            scope-references:
-              - $XSAPPNAME.DocumentRead
-              - $XSAPPNAME.DocumentWrite
-              - $XSAPPNAME.AIQuery
-          - name: DocumentAdmin
-            description: Full access to legal documents
-            scope-references:
-              - $XSAPPNAME.DocumentRead
-              - $XSAPPNAME.DocumentWrite
-              - $XSAPPNAME.DocumentDelete
-              - $XSAPPNAME.AIQuery
+  - builder: custom
+    commands:
+    - npm ci
+    - npx cds build --production

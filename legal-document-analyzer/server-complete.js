@@ -65,13 +65,13 @@ async function startCompleteServer() {
     const server = app.listen(PORT, () => {
       console.log('✅ Legal Document Analyzer started successfully!');
       console.log(`🌐 Server running at: http://localhost:${PORT}`);
-      console.log(`🎨 Fiori UI: http://localhost:${PORT}/ui`);
+      console.log(`🌐 API Root: http://localhost:${PORT}/`);
       console.log(`📊 API Documentation: http://localhost:${PORT}/legal-documents`);
       console.log(`❤️  Health Check: http://localhost:${PORT}/health`);
       console.log(`🔧 API Info: http://localhost:${PORT}/api`);
       console.log('\n🎯 Features Available:');
       console.log('   ✅ SAP CAP Backend Service');
-      console.log('   ✅ SAP Fiori UI5 Frontend');
+      console.log('   ✅ RESTful API Backend');
       console.log('   ✅ Document Management');
       console.log('   ✅ AI Q&A Interface');
       console.log('   ✅ Analytics Dashboard');

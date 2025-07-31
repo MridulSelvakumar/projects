@@ -10,6 +10,7 @@ service LegalDocumentService @(path: '/legal-documents') {
     action processDocument() returns String;
     action reprocessDocument() returns String;
     action deleteDocument() returns String;
+    action downloadSummary() returns LargeBinary;
   };
 
   // Clause management with enhanced search
@@ -59,6 +60,16 @@ service LegalDocumentService @(path: '/legal-documents') {
     success: Boolean;
     documentId: UUID;
     message: String;
+  };
+
+  action generateSummary(
+    documentId: UUID
+  ) returns {
+    summary: String;
+    formattedSummary: String;
+    confidence: Decimal(3,2);
+    method: String;
+    downloadUrl: String;
   };
 
   // Analytics and reporting views

@@ -1,0 +1,24 @@
+SAMPLE LEGAL CONTRACT
+
+This is a sample legal contract for testing the analytics functionality of the Legal Document Analyzer.
+
+PARTIES:
+- Company ABC Inc. (the "Company")
+- John Doe (the "Contractor")
+
+PAYMENT TERMS:
+The Company agrees to pay the Contractor $5,000 per month for services rendered.
+
+TERMINATION CLAUSE:
+Either party may terminate this agreement with 30 days written notice.
+
+CONFIDENTIALITY:
+The Contractor agrees to maintain confidentiality of all proprietary information.
+
+LIABILITY:
+The Company's liability shall not exceed the total amount paid under this agreement.
+
+INTELLECTUAL PROPERTY:
+All work product created shall be owned by the Company.
+
+This contract is effective as of January 1, 2024.

@@ -18,5 +18,5 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
     console.log('✅ Legal Document Analyzer Server Started!');
     console.log(`🌐 Application: http://localhost:${PORT}`);
-    console.log('📱 Your SAP Fiori app is ready!');
+    console.log('📱 Your Legal Document Analyzer API is ready!');
 });

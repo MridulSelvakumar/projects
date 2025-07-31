@@ -1,0 +1,45 @@
+SAMPLE LEGAL CONTRACT
+
+This Service Agreement ("Agreement") is entered into on January 1, 2024, between:
+
+PARTY A: TechCorp Solutions Inc.
+Address: 123 Business Street, Tech City, TC 12345
+Contact: legal@techcorp.com
+
+PARTY B: ClientCorp Ltd.
+Address: 456 Client Avenue, Business Town, BT 67890
+Contact: contracts@clientcorp.com
+
+1. SCOPE OF SERVICES
+TechCorp Solutions Inc. agrees to provide software development services including:
+- Custom application development
+- System integration services
+- Technical support and maintenance
+
+2. PAYMENT TERMS
+- Total contract value: $50,000
+- Payment schedule: 50% upfront, 50% upon completion
+- Late payment penalty: 2% per month
+- Payment method: Bank transfer within 30 days
+
+3. LIABILITY CLAUSE
+TechCorp's liability shall be limited to the total contract value. In no event shall TechCorp be liable for indirect, incidental, or consequential damages.
+
+4. CONFIDENTIALITY
+Both parties agree to maintain confidentiality of proprietary information shared during the course of this agreement for a period of 5 years.
+
+5. TERMINATION
+Either party may terminate this agreement with 30 days written notice. Upon termination, all work products shall be delivered and final payment made.
+
+6. INTELLECTUAL PROPERTY
+All custom software developed under this agreement shall be owned by ClientCorp. TechCorp retains rights to general methodologies and know-how.
+
+7. GOVERNING LAW
+This agreement shall be governed by the laws of the State of California.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written above.
+
+TechCorp Solutions Inc.          ClientCorp Ltd.
+_____________________          _____________________
+John Smith, CEO                 Jane Doe, CTO
+Date: January 1, 2024          Date: January 1, 2024

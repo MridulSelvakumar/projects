@@ -8,5 +8,7 @@
     // "tab",
     // "tsv"
   ],
-  "SAP HANA Database Explorer.ShowXsAdvancedConnections": true
+  "SAP HANA Database Explorer.ShowXsAdvancedConnections": true,
+  "SAP HANA SQLScript LSP.URL": "https://cf-us10-001.cf.hana-tooling.ingress.orchestration.prod-us10.hanacloud.ondemand.com/hrtt-service",
+  "SAP HANA SQLScript LSP.XsAdvancedHrttServiceUrl": ""
 }

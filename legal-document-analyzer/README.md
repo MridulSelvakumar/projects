@@ -4,11 +4,11 @@ An intelligent enterprise application built with SAP BTP, CAPM, HANA Cloud, and 
 
 ## 🎯 Project Overview
 
-The Legal Document Analyzer leverages modern AI technologies to transform how organizations handle legal document analysis. Users can upload contracts, NDAs, and other legal documents through a sophisticated SAP Fiori interface, while the system automatically extracts key clauses, identifies parties, and enables natural language querying through an integrated chat interface powered by LLaMA 3.
+The Legal Document Analyzer leverages modern AI technologies to transform how organizations handle legal document analysis. Users can upload contracts, NDAs, and other legal documents through a RESTful API interface, while the system automatically extracts key clauses, identifies parties, and enables natural language querying through an integrated AI service powered by LLaMA 3.
 
 ## 🏗️ Architecture
 
-The solution employs a comprehensive microservices architecture deployed on SAP BTP Cloud Foundry, consisting of three main components working in harmony. The frontend utilizes SAP Fiori and UI5 technologies to provide an intuitive document upload interface and chat-style query system. The backend leverages SAP Cloud Application Programming Model with Node.js runtime, implementing CDS models for Documents, Clauses, Parties, and vector embeddings while orchestrating document processing and AI service integration. The AI layer features a Python microservice that integrates with LLaMA 3 via Ollama, generates embeddings using sentence transformers, and implements a Retrieval-Augmented Generation pipeline for contextually accurate responses.
+The solution employs a comprehensive microservices architecture deployed on SAP BTP Cloud Foundry, consisting of three main components working in harmony. The API layer provides RESTful endpoints for document upload and AI querying. The backend leverages SAP Cloud Application Programming Model with Node.js runtime, implementing CDS models for Documents, Clauses, Parties, and vector embeddings while orchestrating document processing and AI service integration. The AI layer features a Python microservice that integrates with LLaMA 3 via Ollama, generates embeddings using sentence transformers, and implements a Retrieval-Augmented Generation pipeline for contextually accurate responses.
 
 ## 🚀 Key Features
 
@@ -104,7 +104,7 @@ cf deploy mta_archives/legal-document-analyzer_1.0.0.mtar
 ## 📖 Usage Guide
 
 ### Document Upload Process
-Users begin by accessing the SAP Fiori application and navigating to the document upload section. They can drag and drop legal documents or use the file picker to select PDF, Word, or text files. The system supports documents up to 50MB and automatically detects document types including contracts, NDAs, agreements, and policies. Upon upload, documents are stored in HANA Cloud while the AI service processes them asynchronously to extract text, identify clauses, and generate vector embeddings.
+Users begin by accessing the API endpoints to upload documents. They can send PDF, Word documents, or text files via POST requests to the upload endpoint. The system supports documents up to 50MB and automatically detects document types including contracts, NDAs, agreements, and policies. Upon upload, documents are stored in HANA Cloud while the AI service processes them asynchronously to extract text, identify clauses, and generate vector embeddings.
 
 ### AI-Powered Querying
 Once documents are processed, users can select any document and interact with the AI assistant through a chat-style interface. The system supports natural language questions such as "What is the liability clause in this contract?" or "Who are the parties involved in this agreement?" The AI service uses Retrieval-Augmented Generation to find relevant clauses and provide contextually accurate responses based only on the document content.
@@ -135,7 +135,7 @@ npm run test:integration   # End-to-end API tests
 
 ```
 legal-document-analyzer/
-├── app/legal-document-ui/     # SAP Fiori frontend application
+├── api/                       # RESTful API endpoints
 ├── srv/                       # CAP backend services and logic
 ├── db/                        # CDS data models and HANA artifacts
 ├── ai-service/               # Python AI microservice
@@ -154,7 +154,7 @@ legal-document-analyzer/
 - `OLLAMA_HOST`: Ollama service endpoint
 
 ### Service Configuration
-Edit `package.json` for CAP configuration, `ai-service/app.py` for AI service settings, and `app/legal-document-ui/manifest.json` for UI5 configuration.
+Edit `package.json` for CAP configuration and `ai-service/app.py` for AI service settings.
 
 ## 🤝 Contributing
 

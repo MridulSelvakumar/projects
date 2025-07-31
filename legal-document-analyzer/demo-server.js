@@ -7,12 +7,12 @@ const PORT = 4004;
 // Serve static files
 app.use(express.static('public'));
 
-// Serve Fiori UI
-app.use('/ui', express.static(path.join(__dirname, 'app/legal-document-ui')));
-
-// Redirect root to Fiori UI
+// API root
 app.get('/', (req, res) => {
-  res.redirect('/ui');
+  res.json({
+    message: 'Legal Document Analyzer Demo API',
+    endpoints: ['/legal-documents', '/health']
+  });
 });
 
 // Demo endpoints
@@ -62,7 +62,7 @@ app.get('/health', (req, res) => {
 app.listen(PORT, () => {
   console.log('🚀 Legal Document Analyzer Demo Server Started!');
   console.log(`🌐 Server running at: http://localhost:${PORT}`);
-  console.log(`🎨 Fiori UI: http://localhost:${PORT}/ui`);
+  console.log(`🌐 API Root: http://localhost:${PORT}/`);
   console.log('📊 API Documentation: http://localhost:4004/legal-documents');
   console.log('❤️  Health Check: http://localhost:4004/health');
   console.log('\n✨ This is a demo server showing the project structure.');

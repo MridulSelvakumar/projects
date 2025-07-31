@@ -1,0 +1,12 @@
+<mvc:View controllerName="project1.controller.View1"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    <Page id="page" title="Documents" showNavButton="true" navButtonPress="onNavBack">
+        <content>
+            <VBox id="documentsVBox" class="sapUiMediumMargin">
+                <Title id="documentsTitle" text="Document Management" level="H2" class="sapUiMediumMarginBottom"/>
+                <Text id="documentsText" text="This is the documents view. Document management functionality will be implemented here."/>
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>
