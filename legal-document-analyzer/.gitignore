@@ -18,6 +18,15 @@ target/
 *.mtar
 mta_archives/
 
+# Environment and Security
+.env
+.env.local
+.env.production
+.env.staging
+*.key
+*.pem
+*.p12
+
 # Other
 .DS_Store
 *.orig

@@ -1,0 +1,115 @@
+<mvc:View controllerName="project1.controller.Analytics"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <Page id="analyticsPage" title="Analytics" showNavButton="false">
+        <content>
+            <VBox class="sapUiMediumMargin">
+                <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiMediumMarginBottom">
+                    <Title text="Document Analytics Dashboard" level="H2"/>
+                    <Button text="Refresh" icon="sap-icon://refresh" press="onRefresh"/>
+                </HBox>
+
+                <!-- Loading Indicator -->
+                <BusyIndicator visible="{analytics>/isLoading}" class="sapUiMediumMargin"/>
+
+                <!-- Key Metrics Cards -->
+                <HBox class="sapUiMediumMarginBottom" visible="{= !${analytics>/isLoading}}">
+                    <VBox class="sapUiMediumMarginEnd">
+                        <Panel headerText="Total Documents" class="sapUiResponsiveMargin">
+                            <content>
+                                <VBox alignItems="Center" class="sapUiMediumMargin">
+                                    <Text text="{analytics>/totalDocuments}" class="sapUiLargeText sapThemeHighlight-asColor"/>
+                                    <Text text="Documents Processed" class="sapUiSmallText"/>
+                                </VBox>
+                            </content>
+                        </Panel>
+                    </VBox>
+
+                    <VBox class="sapUiMediumMarginEnd">
+                        <Panel headerText="Analysis Accuracy" class="sapUiResponsiveMargin">
+                            <content>
+                                <VBox alignItems="Center" class="sapUiMediumMargin">
+                                    <Text text="{analytics>/averageAccuracy}" class="sapUiLargeText sapThemeHighlight-asColor"/>
+                                    <Text text="Average Accuracy" class="sapUiSmallText"/>
+                                </VBox>
+                            </content>
+                        </Panel>
+                    </VBox>
+
+                    <VBox class="sapUiMediumMarginEnd">
+                        <Panel headerText="Processing Time" class="sapUiResponsiveMargin">
+                            <content>
+                                <VBox alignItems="Center" class="sapUiMediumMargin">
+                                    <Text text="{analytics>/averageProcessingTime}" class="sapUiLargeText sapThemeHighlight-asColor"/>
+                                    <Text text="Average Time" class="sapUiSmallText"/>
+                                </VBox>
+                            </content>
+                        </Panel>
+                    </VBox>
+                </HBox>
+                
+                <!-- Charts Section -->
+                <Panel headerText="Document Types Distribution" class="sapUiResponsiveMargin" visible="{= !${analytics>/isLoading}}">
+                    <content>
+                        <VBox class="sapUiMediumMargin">
+                            <Text text="Distribution of document types processed" class="sapUiSmallText sapUiMediumMarginBottom"/>
+                            <!-- Placeholder for chart -->
+                            <HBox>
+                                <VBox class="sapUiMediumMarginEnd">
+                                    <Text text="{analytics>/distributionText}" class="sapUiMediumText"/>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+                    </content>
+                </Panel>
+
+                <!-- Recent Activity -->
+                <Panel headerText="Recent Analysis Activity" class="sapUiResponsiveMargin" visible="{= !${analytics>/isLoading}}">
+                    <headerToolbar>
+                        <Toolbar>
+                            <Title text="Recent Analysis Activity" level="H4"/>
+                            <ToolbarSpacer/>
+                            <Label text="Last Updated: {analytics>/lastUpdated}"/>
+                        </Toolbar>
+                    </headerToolbar>
+                    <content>
+                        <Table id="recentActivityTable" items="{analytics>/recentActivity}">
+                            <columns>
+                                <Column>
+                                    <Text text="Document"/>
+                                </Column>
+                                <Column>
+                                    <Text text="Type"/>
+                                </Column>
+                                <Column>
+                                    <Text text="Date"/>
+                                </Column>
+                                <Column>
+                                    <Text text="Confidence"/>
+                                </Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem>
+                                    <cells>
+                                        <Text text="{title}"/>
+                                        <Text text="{documentType}"/>
+                                        <Text text="{path: 'modifiedAt', formatter: '.formatDate'}"/>
+                                        <Text text="{path: 'confidence', formatter: '.formatConfidence'}"/>
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                            <noData>
+                                <VBox alignItems="Center" class="sapUiMediumMargin">
+                                    <core:Icon src="sap-icon://pie-chart" size="3rem" color="Neutral"/>
+                                    <Text text="No analysis activity yet" class="sapUiMediumMarginTop"/>
+                                    <Text text="Analyze documents using the AI Analyzer to see activity here"/>
+                                </VBox>
+                            </noData>
+                        </Table>
+                    </content>
+                </Panel>
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

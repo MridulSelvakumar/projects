@@ -1,0 +1,240 @@
+<mvc:View controllerName="project1.controller.Settings"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <Page id="settingsPage" title="{i18n>settingsTitle}" showNavButton="false">
+        <content>
+            <VBox class="sapUiMediumMargin">
+                <Title text="{i18n>applicationSettings}" level="H2" class="sapUiMediumMarginBottom"/>
+
+                <!-- General Settings -->
+                <Panel headerText="{i18n>generalSettings}" class="sapUiResponsiveMargin">
+                    <content>
+                        <VBox class="sapUiMediumMargin">
+                            <Label text="{i18n>applicationTheme}" class="sapUiSmallMarginBottom"/>
+                            <Select id="themeSelect" selectedKey="{/theme}" change="onThemeChange">
+                                <core:Item key="sap_horizon" text="{i18n>sapHorizon}"/>
+                                <core:Item key="sap_fiori_3" text="{i18n>sapFiori3}"/>
+                                <core:Item key="sap_fiori_3_dark" text="{i18n>sapFiori3Dark}"/>
+                            </Select>
+                            
+                            <Label text="{i18n>language}" class="sapUiMediumMarginTop sapUiSmallMarginBottom"/>
+                            <Select id="languageSelect" selectedKey="{/language}" change="onLanguageChange">
+                                <core:Item key="en" text="{i18n>english}"/>
+                                <core:Item key="de" text="{i18n>german}"/>
+                                <core:Item key="fr" text="{i18n>french}"/>
+                                <core:Item key="es" text="{i18n>spanish}"/>
+                            </Select>
+                            
+                            <CheckBox id="autoSaveCheckbox" text="{i18n>enableAutoSave}" selected="{/autoSave}" class="sapUiMediumMarginTop"/>
+                        </VBox>
+                    </content>
+                </Panel>
+
+                <!-- AI Analysis Settings -->
+                <Panel headerText="{i18n>aiAnalysisSettings}" class="sapUiResponsiveMargin">
+                    <content>
+                        <VBox class="sapUiMediumMargin">
+                            <Label text="{i18n>confidenceThreshold}" class="sapUiSmallMarginBottom"/>
+                            <Slider id="confidenceSlider" value="{/confidenceThreshold}" min="0" max="100" step="5"
+                                    showAdvancedTooltip="true" showHandleTooltip="true" class="sapUiMediumMarginBottom"/>
+
+                            <Label text="{i18n>maxFileSizeMB}" class="sapUiSmallMarginBottom"/>
+                            <Input id="maxFileSizeInput" value="{/maxFileSize}" type="Number" class="sapUiMediumMarginBottom"/>
+
+                            <CheckBox id="enableOCRCheckbox" text="{i18n>enableOCR}" selected="{/enableOCR}"/>
+                            <CheckBox id="enableBatchProcessingCheckbox" text="{i18n>enableBatchProcessing}" selected="{/enableBatchProcessing}" class="sapUiSmallMarginTop"/>
+                        </VBox>
+                    </content>
+                </Panel>
+                
+                <!-- Security Settings -->
+                <Panel headerText="Security and Privacy" class="sapUiResponsiveMargin">
+                    <content>
+                        <VBox class="sapUiMediumMargin">
+                            <CheckBox id="encryptDataCheckbox" text="Encrypt stored documents" selected="{/encryptData}"/>
+                            <CheckBox id="logAnalysisCheckbox" text="Log analysis activities" selected="{/logAnalysis}" class="sapUiSmallMarginTop"/>
+                            <CheckBox id="shareAnalyticsCheckbox" text="Share anonymous usage analytics" selected="{/shareAnalytics}" class="sapUiSmallMarginTop"/>
+                            
+                            <Label text="Data Retention Period (days):" class="sapUiMediumMarginTop sapUiSmallMarginBottom"/>
+                            <Input id="retentionPeriodInput" value="{/retentionPeriod}" type="Number"/>
+                        </VBox>
+                    </content>
+                </Panel>
+                
+                <!-- AI Model Configuration -->
+                <Panel headerText="AI Model Configuration" class="sapUiResponsiveMargin">
+                    <content>
+                        <VBox class="sapUiMediumMargin">
+                            <Label text="Primary AI Service:" class="sapUiSmallMarginBottom"/>
+                            <Select id="aiServiceSelect" selectedKey="{/aiService}" change="onAIServiceChange">
+                                <core:Item key="enterprise" text="Enterprise AI Service"/>
+                                <core:Item key="genai" text="Generative AI + RAG"/>
+                                <core:Item key="basic" text="Basic AI Analyzer"/>
+                            </Select>
+
+                            <Label text="Model Temperature:" class="sapUiMediumMarginTop sapUiSmallMarginBottom"/>
+                            <Slider id="temperatureSlider" value="{/modelTemperature}" min="0" max="1" step="0.1"
+                                    showAdvancedTooltip="true" showHandleTooltip="true" class="sapUiMediumMarginBottom"/>
+
+                            <Label text="Max Tokens:" class="sapUiSmallMarginBottom"/>
+                            <Input id="maxTokensInput" value="{/maxTokens}" type="Number" class="sapUiMediumMarginBottom"/>
+
+                            <CheckBox id="enableRAGCheckbox" text="Enable RAG (Retrieval Augmented Generation)" selected="{/enableRAG}"/>
+                            <CheckBox id="enableCachingCheckbox" text="Enable response caching" selected="{/enableCaching}" class="sapUiSmallMarginTop"/>
+
+                            <HBox class="sapUiMediumMarginTop">
+                                <Button text="Test AI Connection" press="onTestAIConnection" icon="sap-icon://connected"/>
+                                <Button text="View Model Status" press="onViewModelStatus" icon="sap-icon://status-positive" class="sapUiTinyMarginBegin"/>
+                            </HBox>
+                        </VBox>
+                    </content>
+                </Panel>
+
+                <!-- Performance & Monitoring -->
+                <Panel headerText="Performance and Monitoring" class="sapUiResponsiveMargin">
+                    <content>
+                        <VBox class="sapUiMediumMargin">
+                            <Label text="Processing Queue Size:" class="sapUiSmallMarginBottom"/>
+                            <Input id="queueSizeInput" value="{/queueSize}" type="Number" class="sapUiMediumMarginBottom"/>
+
+                            <Label text="Concurrent Processing Limit:" class="sapUiSmallMarginBottom"/>
+                            <Input id="concurrentLimitInput" value="{/concurrentLimit}" type="Number" class="sapUiMediumMarginBottom"/>
+
+                            <CheckBox id="enableMetricsCheckbox" text="Enable performance metrics collection" selected="{/enableMetrics}"/>
+                            <CheckBox id="enableDebugLoggingCheckbox" text="Enable debug logging" selected="{/enableDebugLogging}" class="sapUiSmallMarginTop"/>
+
+                            <HBox class="sapUiMediumMarginTop">
+                                <Button text="View System Status" press="onViewSystemStatus" icon="sap-icon://monitor-payments"/>
+                                <Button text="Clear Cache" press="onClearCache" icon="sap-icon://clear-all" class="sapUiTinyMarginBegin"/>
+                                <Button text="Export Logs" press="onExportLogs" icon="sap-icon://download" class="sapUiTinyMarginBegin"/>
+                            </HBox>
+                        </VBox>
+                    </content>
+                </Panel>
+
+                <!-- Notification Settings -->
+                <Panel headerText="Notifications" class="sapUiResponsiveMargin">
+                    <content>
+                        <VBox class="sapUiMediumMargin">
+                            <CheckBox id="emailNotificationsCheckbox" text="Email notifications" selected="{/emailNotifications}"/>
+                            <CheckBox id="analysisCompleteCheckbox" text="Notify when analysis is complete" selected="{/notifyAnalysisComplete}" class="sapUiSmallMarginTop"/>
+                            <CheckBox id="errorNotificationsCheckbox" text="Notify on errors" selected="{/notifyErrors}" class="sapUiSmallMarginTop"/>
+
+                            <Label text="Email Address:" class="sapUiMediumMarginTop sapUiSmallMarginBottom"/>
+                            <Input id="emailAddressInput" value="{/emailAddress}" type="Email" placeholder="user@example.com"/>
+
+                            <Label text="Notification Frequency:" class="sapUiMediumMarginTop sapUiSmallMarginBottom"/>
+                            <Select id="notificationFrequencySelect" selectedKey="{/notificationFrequency}">
+                                <core:Item key="immediate" text="Immediate"/>
+                                <core:Item key="hourly" text="Hourly Digest"/>
+                                <core:Item key="daily" text="Daily Summary"/>
+                                <core:Item key="weekly" text="Weekly Report"/>
+                            </Select>
+                        </VBox>
+                    </content>
+                </Panel>
+
+                <!-- Backup & Data Management -->
+                <Panel headerText="Backup and Data Management" class="sapUiResponsiveMargin">
+                    <content>
+                        <VBox class="sapUiMediumMargin">
+                            <Label text="Auto-backup Frequency:" class="sapUiSmallMarginBottom"/>
+                            <Select id="backupFrequencySelect" selectedKey="{/backupFrequency}">
+                                <core:Item key="disabled" text="Disabled"/>
+                                <core:Item key="daily" text="Daily"/>
+                                <core:Item key="weekly" text="Weekly"/>
+                                <core:Item key="monthly" text="Monthly"/>
+                            </Select>
+
+                            <Label text="Backup Location:" class="sapUiMediumMarginTop sapUiSmallMarginBottom"/>
+                            <Input id="backupLocationInput" value="{/backupLocation}" placeholder="/backup/legal-docs"/>
+
+                            <CheckBox id="compressBackupsCheckbox" text="Compress backup files" selected="{/compressBackups}" class="sapUiMediumMarginTop"/>
+                            <CheckBox id="encryptBackupsCheckbox" text="Encrypt backup files" selected="{/encryptBackups}" class="sapUiSmallMarginTop"/>
+
+                            <HBox class="sapUiMediumMarginTop">
+                                <Button text="Create Backup Now" press="onCreateBackup" icon="sap-icon://save" type="Emphasized"/>
+                                <Button text="Restore from Backup" press="onRestoreBackup" icon="sap-icon://upload" class="sapUiTinyMarginBegin"/>
+                                <Button text="Clean Old Data" press="onCleanOldData" icon="sap-icon://delete" class="sapUiTinyMarginBegin"/>
+                            </HBox>
+                        </VBox>
+                    </content>
+                </Panel>
+
+                <!-- Import/Export Settings -->
+                <Panel headerText="Settings Management" class="sapUiResponsiveMargin">
+                    <content>
+                        <VBox class="sapUiMediumMargin">
+                            <Text text="Export or import your application settings for backup or sharing across environments." class="sapUiSmallText sapUiMediumMarginBottom"/>
+
+                            <HBox class="sapUiMediumMarginBottom">
+                                <Button text="Export Settings" press="onExportSettings" icon="sap-icon://download"/>
+                                <Button text="Import Settings" press="onImportSettings" icon="sap-icon://upload" class="sapUiTinyMarginBegin"/>
+                            </HBox>
+
+                            <Label text="Configuration Profile:" class="sapUiSmallMarginBottom"/>
+                            <Select id="configProfileSelect" selectedKey="{/configProfile}" change="onConfigProfileChange">
+                                <core:Item key="default" text="Default"/>
+                                <core:Item key="development" text="Development"/>
+                                <core:Item key="production" text="Production"/>
+                                <core:Item key="custom" text="Custom"/>
+                            </Select>
+                        </VBox>
+                    </content>
+                </Panel>
+
+                <!-- System Information -->
+                <Panel headerText="System Information" class="sapUiResponsiveMargin">
+                    <content>
+                        <VBox class="sapUiMediumMargin">
+                            <HBox class="sapUiMediumMarginBottom">
+                                <VBox class="sapUiMediumMarginEnd">
+                                    <Label text="Application Version:"/>
+                                    <Text text="{/systemInfo/appVersion}" class="sapUiSmallMarginTop"/>
+                                </VBox>
+                                <VBox class="sapUiMediumMarginEnd">
+                                    <Label text="Database Status:"/>
+                                    <Text text="{/systemInfo/dbStatus}" class="sapUiSmallMarginTop"/>
+                                </VBox>
+                                <VBox class="sapUiMediumMarginEnd">
+                                    <Label text="AI Service Status:"/>
+                                    <Text text="{/systemInfo/aiStatus}" class="sapUiSmallMarginTop"/>
+                                </VBox>
+                            </HBox>
+
+                            <HBox class="sapUiMediumMarginBottom">
+                                <VBox class="sapUiMediumMarginEnd">
+                                    <Label text="Total Documents:"/>
+                                    <Text text="{/systemInfo/totalDocuments}" class="sapUiSmallMarginTop"/>
+                                </VBox>
+                                <VBox class="sapUiMediumMarginEnd">
+                                    <Label text="Storage Used:"/>
+                                    <Text text="{/systemInfo/storageUsed}" class="sapUiSmallMarginTop"/>
+                                </VBox>
+                                <VBox class="sapUiMediumMarginEnd">
+                                    <Label text="Last Backup:"/>
+                                    <Text text="{/systemInfo/lastBackup}" class="sapUiSmallMarginTop"/>
+                                </VBox>
+                            </HBox>
+
+                            <Button text="Refresh System Info" press="onRefreshSystemInfo" icon="sap-icon://refresh"/>
+                        </VBox>
+                    </content>
+                </Panel>
+
+                <!-- Action Buttons -->
+                <HBox class="sapUiMediumMarginTop" justifyContent="SpaceBetween">
+                    <HBox>
+                        <Button text="{i18n>saveSettings}" type="Emphasized" press="onSaveSettings" class="sapUiMediumMarginEnd"/>
+                        <Button text="{i18n>resetDefaults}" press="onResetSettings"/>
+                    </HBox>
+                    <HBox>
+                        <Button text="{i18n>advancedSettings}" press="onAdvancedSettings" icon="sap-icon://settings"/>
+                        <Button text="{i18n>helpDocumentation}" press="onShowHelp" icon="sap-icon://sys-help" class="sapUiTinyMarginBegin"/>
+                    </HBox>
+                </HBox>
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

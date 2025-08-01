@@ -1,0 +1,62 @@
+<mvc:View controllerName="project1.controller.AIAnalyzer"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    
+    <Page id="aiAnalyzerPage" title="AI Document Analyzer" showNavButton="false">
+        <content>
+            <VBox class="sapUiMediumMargin">
+                <Title text="AI-Powered Document Analysis" level="H2" class="sapUiMediumMarginBottom"/>
+                
+                <!-- Test Section -->
+                <Panel headerText="AI Analyzer Test" class="sapUiMediumMarginBottom">
+                    <content>
+                        <VBox class="sapUiMediumMargin">
+                            <Text text="AI Analyzer is working!" class="sapUiMediumText sapUiTinyMarginBottom"/>
+                            <Button text="Load Sample Document" press="onUseSampleDocument" type="Emphasized" class="sapUiTinyMarginBottom"/>
+                            <Text text="Document Status: {= ${aiModel>/documentUploaded} ? 'Document Ready ✓' : 'No Document'}" class="sapUiMediumText"/>
+                        </VBox>
+                    </content>
+                </Panel>
+                
+                <!-- Simple Analysis -->
+                <Panel headerText="Quick Analysis" class="sapUiMediumMarginBottom">
+                    <content>
+                        <VBox class="sapUiMediumMargin">
+                            <Button text="Analyze Document" press="onAnalyzeDocument" type="Emphasized" enabled="{aiModel>/documentUploaded}" class="sapUiTinyMarginBottom"/>
+                            <Text text="Click 'Load Sample Document' first, then 'Analyze Document'" class="sapUiTinyText"/>
+                        </VBox>
+                    </content>
+                </Panel>
+                
+                <!-- Simple Questions -->
+                <Panel headerText="Ask Questions" class="sapUiMediumMarginBottom">
+                    <content>
+                        <VBox class="sapUiMediumMargin">
+                            <Input value="{aiModel>/currentQuestion}" placeholder="Ask about the document..." class="sapUiTinyMarginBottom"/>
+                            <HBox class="sapUiTinyMarginBottom">
+                                <Button text="Ask Question" press="onAskQuestion" type="Emphasized" class="sapUiTinyMarginEnd"/>
+                                <Button text="Payment Terms?" press="onQuickPaymentTerms" type="Default"/>
+                            </HBox>
+                        </VBox>
+                    </content>
+                </Panel>
+                
+                <!-- Results Section -->
+                <Panel headerText="Results" class="sapUiMediumMarginBottom">
+                    <content>
+                        <VBox class="sapUiMediumMargin">
+                            <Text text="Results will appear here..." class="sapUiMediumText"/>
+                            <List items="{aiModel>/questionAnswers}">
+                                <StandardListItem title="Q: {aiModel>question}" description="A: {aiModel>answer}"/>
+                            </List>
+                            <List items="{aiModel>/analysisResults}">
+                                <StandardListItem title="{aiModel>type}" description="{aiModel>content}" info="{aiModel>confidence}%"/>
+                            </List>
+                        </VBox>
+                    </content>
+                </Panel>
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

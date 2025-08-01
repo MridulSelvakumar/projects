@@ -22,14 +22,17 @@ sap.ui.define([
               case "dashboard":
                   router.navTo("RouteDashboard");
                   break;
+              case "ai-analyzer":
+                  router.navTo("RouteAIAnalyzer");
+                  break;
               case "documents":
-                  router.navTo("RouteView1");
+                  router.navTo("RouteDocuments");
                   break;
               case "analytics":
-                  // Navigate to analytics view when implemented
+                  router.navTo("RouteAnalytics");
                   break;
               case "settings":
-                  // Navigate to settings view when implemented
+                  router.navTo("RouteSettings");
                   break;
               default:
                   router.navTo("RouteDashboard");

@@ -8,17 +8,18 @@
             <tnt:ToolHeader id="toolHeader">
                 <Button id="menuButton" icon="sap-icon://menu2" press="onMenuButtonPress" tooltip="Show/Hide Navigation"/>
                 <tnt:ToolHeaderUtilitySeparator id="separator"/>
-                <Title id="appTitle" text="Legal Document Analyzer" level="H4"/>
+                <Title id="appTitle" text="{i18n>appTitle}" level="H4"/>
             </tnt:ToolHeader>
         </tnt:header>
 
         <tnt:sideContent>
             <tnt:SideNavigation id="sideNavigation" expanded="true">
                 <tnt:NavigationList id="navigationList">
-                    <tnt:NavigationListItem id="dashboardNav" text="Dashboard" icon="sap-icon://business-objects-experience" key="dashboard" select="onNavigationSelect"/>
-                    <tnt:NavigationListItem id="documentsNav" text="Documents" icon="sap-icon://document" key="documents" select="onNavigationSelect"/>
-                    <tnt:NavigationListItem id="analyticsNav" text="Analytics" icon="sap-icon://pie-chart" key="analytics" select="onNavigationSelect"/>
-                    <tnt:NavigationListItem id="settingsNav" text="Settings" icon="sap-icon://action-settings" key="settings" select="onNavigationSelect"/>
+                    <tnt:NavigationListItem id="dashboardNav" text="{i18n>navDashboard}" icon="sap-icon://business-objects-experience" key="dashboard" select="onNavigationSelect"/>
+                    <tnt:NavigationListItem id="aiAnalyzerNav" text="{i18n>navAIAnalyzer}" icon="sap-icon://ai" key="ai-analyzer" select="onNavigationSelect"/>
+                    <tnt:NavigationListItem id="documentsNav" text="{i18n>navDocuments}" icon="sap-icon://document" key="documents" select="onNavigationSelect"/>
+                    <tnt:NavigationListItem id="analyticsNav" text="{i18n>navAnalytics}" icon="sap-icon://pie-chart" key="analytics" select="onNavigationSelect"/>
+                    <tnt:NavigationListItem id="settingsNav" text="{i18n>navSettings}" icon="sap-icon://action-settings" key="settings" select="onNavigationSelect"/>
                 </tnt:NavigationList>
             </tnt:SideNavigation>
         </tnt:sideContent>

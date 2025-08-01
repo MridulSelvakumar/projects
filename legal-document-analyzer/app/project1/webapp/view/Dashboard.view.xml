@@ -2,251 +2,102 @@
     controllerName="project1.controller.Dashboard"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
-    xmlns:core="sap.ui.core"
-    xmlns:f="sap.f"
-    xmlns:card="sap.f.cards">
-    
-    <Page id="dashboardPage" title="Legal Document Analyzer - Dashboard" showNavButton="true" navButtonPress="onNavBack">
-        
+    xmlns:core="sap.ui.core">
+
+    <Page id="dashboardPage" title="Legal Document Analyzer" showNavButton="false">
         <content>
-            <ScrollContainer height="100%" width="100%" horizontal="false" vertical="true">
-                
-                <!-- Header Section with Key Metrics -->
-                <VBox class="sapUiMediumMargin">
-                    <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiMediumMarginBottom">
-                        <Title text="Dashboard Overview" level="H2"/>
-                        <HBox>
-                            <Text text="Last Updated: {dashboard>/lastUpdated}" class="sapUiTinyMarginEnd"/>
-                            <Button icon="sap-icon://refresh" press="onRefresh" tooltip="Refresh Dashboard"/>
+            <VBox class="sapUiMediumMargin">
+
+                <!-- Header Section -->
+                <HBox alignItems="Center" justifyContent="SpaceBetween" class="sapUiMediumMarginBottom">
+                    <VBox>
+                        <Title text="Dashboard" level="H2"/>
+                        <Text text="Legal Document Analysis Overview" class="sapUiTinyMarginTop"/>
+                    </VBox>
+                    <Button text="AI Analyzer" icon="sap-icon://artificial-intelligence" press="onNavigateToAIAnalyzer" type="Emphasized"/>
+                </HBox>
+
+                <!-- Key Metrics -->
+                <Panel headerText="Key Metrics" class="sapUiMediumMarginBottom">
+                    <content>
+                        <HBox class="sapUiMediumMargin" wrap="Wrap">
+                            <VBox class="sapUiMediumMarginEnd">
+                                <Title text="{dashboard>/metrics/totalDocuments}" level="H3" class="sapUiNoMarginTop"/>
+                                <Text text="Total Documents"/>
+                            </VBox>
+                            <VBox class="sapUiMediumMarginEnd">
+                                <Title text="{dashboard>/metrics/successRate}%" level="H3" class="sapUiNoMarginTop"/>
+                                <Text text="Success Rate"/>
+                            </VBox>
+                            <VBox class="sapUiMediumMarginEnd">
+                                <Title text="{dashboard>/metrics/avgProcessingTime}s" level="H3" class="sapUiNoMarginTop"/>
+                                <Text text="Avg Processing Time"/>
+                            </VBox>
+                            <VBox class="sapUiMediumMarginEnd">
+                                <Title text="{dashboard>/metrics/totalClauses}" level="H3" class="sapUiNoMarginTop"/>
+                                <Text text="Total Clauses"/>
+                            </VBox>
+                            <VBox>
+                                <Title text="{dashboard>/metrics/totalQueries}" level="H3" class="sapUiNoMarginTop"/>
+                                <Text text="AI Questions Asked"/>
+                            </VBox>
                         </HBox>
-                    </HBox>
-                    
-                    <!-- Key Metrics Tiles -->
-                    <TileContainer>
-                        <StandardTile 
-                            header="Total Documents" 
-                            subheader="Uploaded" 
-                            number="{dashboard>/metrics/totalDocuments}"
-                            press="onNavigateToDocuments"
-                            class="sapUiTinyMargin"/>
-                        
-                        <StandardTile 
-                            header="Processed" 
-                            subheader="Successfully" 
-                            number="{dashboard>/metrics/processedDocuments}"
-                            press="onNavigateToDocuments"
-                            class="sapUiTinyMargin"/>
-                        
-                        <StandardTile 
-                            header="Total Clauses" 
-                            subheader="Extracted" 
-                            number="{dashboard>/metrics/totalClauses}"
-                            press="onNavigateToClauses"
-                            class="sapUiTinyMargin"/>
-                        
-                        <StandardTile 
-                            header="AI Queries" 
-                            subheader="Processed" 
-                            number="{dashboard>/metrics/totalQueries}"
-                            press="onNavigateToQueries"
-                            class="sapUiTinyMargin"/>
-                        
-                        <StandardTile 
-                            header="Avg Processing" 
-                            subheader="Time (min)" 
-                            number="{dashboard>/metrics/avgProcessingTime}"
-                            class="sapUiTinyMargin"/>
-                        
-                        <StandardTile 
-                            header="Success Rate" 
-                            subheader="Percentage" 
-                            number="{path: 'dashboard>/metrics/successRate', formatter: '.formatPercentage'}"
-                            class="sapUiTinyMargin"/>
-                    </TileContainer>
-                </VBox>
-                
-                <!-- Main Content Area -->
-                <VBox class="sapUiMediumMargin">
-                    
-                    <!-- Recent Documents and Processing Status Row -->
-                    <HBox class="sapUiMediumMarginBottom">
-                        
-                        <!-- Recent Documents Panel -->
-                        <Panel headerText="Recent Documents" width="50%" class="sapUiTinyMarginEnd">
-                            <content>
-                                <Table items="{dashboard>/recentDocuments}" growing="false" growingThreshold="5">
-                                    <columns>
-                                        <Column>
-                                            <Text text="Document"/>
-                                        </Column>
-                                        <Column>
-                                            <Text text="Type"/>
-                                        </Column>
-                                        <Column>
-                                            <Text text="Status"/>
-                                        </Column>
-                                        <Column>
-                                            <Text text="Date"/>
-                                        </Column>
-                                    </columns>
-                                    <items>
-                                        <ColumnListItem press="onDocumentPress">
-                                            <cells>
-                                                <VBox>
-                                                    <Text text="{dashboard>title}" maxLines="1"/>
-                                                    <Text text="by {dashboard>uploadedBy}" class="sapUiTinyText"/>
-                                                </VBox>
-                                                <Text text="{dashboard>documentType}"/>
-                                                <ObjectStatus 
-                                                    text="{dashboard>status}" 
-                                                    state="{path: 'dashboard>status', formatter: '.formatStatus'}"/>
-                                                <Text text="{path: 'dashboard>createdAt', formatter: '.formatDate'}"/>
-                                            </cells>
-                                        </ColumnListItem>
-                                    </items>
-                                </Table>
-                            </content>
-                        </Panel>
-                        
-                        <!-- Processing Status Panel -->
-                        <Panel headerText="Processing Status" width="50%" class="sapUiTinyMarginStart">
-                            <content>
-                                <Table items="{dashboard>/processingStatus}" growing="false">
-                                    <columns>
-                                        <Column>
-                                            <Text text="Status"/>
-                                        </Column>
-                                        <Column>
-                                            <Text text="Count"/>
-                                        </Column>
-                                        <Column>
-                                            <Text text="Percentage"/>
-                                        </Column>
-                                    </columns>
-                                    <items>
-                                        <ColumnListItem>
-                                            <cells>
-                                                <ObjectStatus 
-                                                    text="{dashboard>status}" 
-                                                    state="{path: 'dashboard>status', formatter: '.formatStatus'}"/>
-                                                <Text text="{dashboard>count}"/>
-                                                <ProgressIndicator 
-                                                    percentValue="{dashboard>percentage}" 
-                                                    displayValue="{path: 'dashboard>percentage', formatter: '.formatPercentage'}"
-                                                    width="100px"/>
-                                            </cells>
-                                        </ColumnListItem>
-                                    </items>
-                                </Table>
-                            </content>
-                        </Panel>
-                        
-                    </HBox>
-                    
-                    <!-- Clause Distribution and Recent Activity Row -->
-                    <HBox class="sapUiMediumMarginBottom">
-                        
-                        <!-- Clause Distribution Panel -->
-                        <Panel headerText="Clause Type Distribution" width="60%" class="sapUiTinyMarginEnd">
-                            <content>
-                                <Table items="{dashboard>/clauseDistribution}" growing="false">
-                                    <columns>
-                                        <Column>
-                                            <Text text="Clause Type"/>
-                                        </Column>
-                                        <Column>
-                                            <Text text="Count"/>
-                                        </Column>
-                                        <Column>
-                                            <Text text="Avg Confidence"/>
-                                        </Column>
-                                        <Column>
-                                            <Text text="Distribution"/>
-                                        </Column>
-                                    </columns>
-                                    <items>
-                                        <ColumnListItem>
-                                            <cells>
-                                                <Text text="{dashboard>clauseType}"/>
-                                                <Text text="{dashboard>clauseCount}"/>
-                                                <Text text="{path: 'dashboard>avgConfidence', formatter: '.formatPercentage'}"/>
-                                                <ProgressIndicator 
-                                                    percentValue="{dashboard>clauseCount}" 
-                                                    displayValue="{dashboard>clauseCount}"
-                                                    width="80px"/>
-                                            </cells>
-                                        </ColumnListItem>
-                                    </items>
-                                </Table>
-                            </content>
-                        </Panel>
-                        
-                        <!-- Recent Activity Panel -->
-                        <Panel headerText="Recent Activity" width="40%" class="sapUiTinyMarginStart">
-                            <content>
-                                <List items="{dashboard>/recentActivity}" growing="false" growingThreshold="8">
-                                    <StandardListItem 
-                                        title="{dashboard>title}"
-                                        description="{dashboard>documentType}"
-                                        info="{path: 'dashboard>modifiedAt', formatter: '.formatDate'}"
-                                        infoState="{path: 'dashboard>status', formatter: '.formatStatus'}"
-                                        icon="sap-icon://document"/>
-                                </List>
-                            </content>
-                        </Panel>
-                        
-                    </HBox>
-                    
-                    <!-- Analytics Summary Panel -->
-                    <Panel headerText="System Analytics" class="sapUiMediumMarginBottom">
-                        <content>
-                            <HBox class="sapUiMediumMargin">
-                                
-                                <!-- Query Performance -->
-                                <VBox width="33%" class="sapUiTinyMarginEnd">
-                                    <Title text="Query Performance" level="H4" class="sapUiTinyMarginBottom"/>
-                                    <ObjectNumber 
-                                        number="{dashboard>/metrics/avgProcessingTime}" 
-                                        unit="sec"
-                                        emphasized="true"
-                                        class="sapUiTinyMarginBottom"/>
-                                    <Text text="Average Response Time" class="sapUiTinyText"/>
-                                </VBox>
-                                
-                                <!-- Success Rate -->
-                                <VBox width="33%" class="sapUiTinyMarginEnd">
-                                    <Title text="AI Accuracy" level="H4" class="sapUiTinyMarginBottom"/>
-                                    <ObjectNumber 
-                                        number="{path: 'dashboard>/metrics/successRate', formatter: '.formatPercentage'}" 
-                                        emphasized="true"
-                                        state="Success"
-                                        class="sapUiTinyMarginBottom"/>
-                                    <Text text="Overall Success Rate" class="sapUiTinyText"/>
-                                </VBox>
-                                
-                                <!-- Processing Efficiency -->
-                                <VBox width="33%">
-                                    <Title text="Processing Efficiency" level="H4" class="sapUiTinyMarginBottom"/>
-                                    <ObjectNumber 
-                                        number="{dashboard>/metrics/processedDocuments}" 
-                                        emphasized="true"
-                                        state="Success"
-                                        class="sapUiTinyMarginBottom"/>
-                                    <Text text="Documents Processed Today" class="sapUiTinyText"/>
-                                </VBox>
-                                
-                            </HBox>
-                        </content>
-                    </Panel>
-                    
-                </VBox>
-                
-            </ScrollContainer>
+                    </content>
+                </Panel>
+
+                <!-- Quick Actions -->
+                <Panel headerText="Quick Actions" class="sapUiMediumMarginBottom">
+                    <content>
+                        <HBox class="sapUiMediumMargin">
+                            <Button text="Upload Document" icon="sap-icon://upload" press="onNavigateToAIAnalyzer" type="Default" class="sapUiTinyMarginEnd"/>
+                            <Button text="View Documents" icon="sap-icon://documents" press="onNavigateToDocuments" type="Default" class="sapUiTinyMarginEnd"/>
+                            <Button text="Analytics" icon="sap-icon://pie-chart" press="onNavigateToAnalytics" type="Default"/>
+                        </HBox>
+                    </content>
+                </Panel>
+
+                <!-- Recent Documents -->
+                <Panel headerText="Recent Documents" class="sapUiMediumMarginBottom">
+                    <content>
+                        <List items="{dashboard>/recentDocuments}" class="sapUiMediumMargin">
+                            <StandardListItem
+                                title="{dashboard>title}"
+                                description="{dashboard>documentType} - {dashboard>status}"
+                                info="{dashboard>uploadedBy}"
+                                icon="sap-icon://document"
+                                press="onDocumentPress"
+                                type="Active"/>
+                        </List>
+                    </content>
+                </Panel>
+
+                <!-- Recent AI Activity -->
+                <Panel headerText="Recent AI Activity" class="sapUiMediumMarginBottom">
+                    <content>
+                        <List items="{dashboard>/recentActivity}" class="sapUiMediumMargin">
+                            <StandardListItem
+                                title="{dashboard>title}"
+                                description="{dashboard>documentType} - {dashboard>status}"
+                                info="{path: 'dashboard>modifiedAt', formatter: '.formatDate'}"
+                                icon="sap-icon://artificial-intelligence"
+                                iconInset="false"/>
+                        </List>
+                    </content>
+                </Panel>
+
+                <!-- Processing Status -->
+                <Panel headerText="Processing Status">
+                    <content>
+                        <List items="{dashboard>/processingStatus}" class="sapUiMediumMargin">
+                            <StandardListItem
+                                title="{dashboard>status}"
+                                description="{dashboard>count} documents ({dashboard>percentage}%)"
+                                icon="{path: 'dashboard>status', formatter: '.getStatusIcon'}"/>
+                        </List>
+                    </content>
+                </Panel>
+
+            </VBox>
         </content>
-        
-        <!-- Loading Indicator -->
-        <BusyIndicator id="busyIndicator" visible="{dashboard>/isLoading}" size="Large"/>
-        
     </Page>
-    
 </mvc:View>

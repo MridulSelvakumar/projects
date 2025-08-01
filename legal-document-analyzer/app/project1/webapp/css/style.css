@@ -112,3 +112,63 @@
     transform: scale(1.02);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
+
+/* Simple Dashboard Styles */
+
+/* Clean, minimal dashboard design */
+.sapMPage {
+    background-color: #f8f9fa;
+}
+
+/* Panel styling */
+.sapMPanel {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border: none;
+    background: white;
+}
+
+.sapMPanel .sapMPanelHdr {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    font-weight: 600;
+}
+
+/* Metrics styling */
+.sapMTitle {
+    color: #2c3e50;
+}
+
+/* Button styling */
+.sapMBtn {
+    border-radius: 6px;
+}
+
+/* List styling */
+.sapMList {
+    border: none;
+}
+
+.sapMSLI {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.sapMSLI:hover {
+    background-color: #f8f9fa;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .sapUiMediumMargin {
+        margin: 1rem;
+    }
+
+    .sapMHBox {
+        flex-direction: column;
+    }
+
+    .sapMHBox > * {
+        margin-bottom: 0.5rem;
+    }
+}
+

@@ -43,7 +43,7 @@
     }
   },
   "sap.ui5": {
-    "flexEnabled": true,
+    "flexEnabled": false,
     "dependencies": {
       "minUI5Version": "1.138.1",
       "libs": {
@@ -107,6 +107,34 @@
           "target": [
             "TargetView1"
           ]
+        },
+        {
+          "name": "RouteAIAnalyzer",
+          "pattern": "ai-analyzer",
+          "target": [
+            "TargetAIAnalyzer"
+          ]
+        },
+        {
+          "name": "RouteAnalytics",
+          "pattern": "analytics",
+          "target": [
+            "TargetAnalytics"
+          ]
+        },
+        {
+          "name": "RouteSettings",
+          "pattern": "settings",
+          "target": [
+            "TargetSettings"
+          ]
+        },
+        {
+          "name": "RouteDocuments",
+          "pattern": "documents",
+          "target": [
+            "TargetDocuments"
+          ]
         }
       ],
       "targets": {
@@ -117,6 +145,22 @@
         "TargetView1": {
           "id": "View1",
           "name": "View1"
+        },
+        "TargetAIAnalyzer": {
+          "id": "AIAnalyzer",
+          "name": "AIAnalyzer"
+        },
+        "TargetAnalytics": {
+          "id": "Analytics",
+          "name": "Analytics"
+        },
+        "TargetSettings": {
+          "id": "Settings",
+          "name": "Settings"
+        },
+        "TargetDocuments": {
+          "id": "Documents",
+          "name": "Documents"
         }
       }
     },

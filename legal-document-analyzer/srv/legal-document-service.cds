@@ -37,12 +37,25 @@ service LegalDocumentService @(path: '/legal-documents') {
   entity DocumentQueries as projection on lda.DocumentQueries;
 
   // Unbound actions for the service
+  action analyzeDocument(
+    documentText: String,
+    analysisType: String
+  ) returns {
+    success: Boolean;
+    analysis: String;
+    confidence: Decimal(3,2);
+    timestamp: String;
+  };
+
   action askQuestion(
     documentId: UUID,
     question: String,
-    queryType: String
+    queryType: String,
+    documentText: String
   ) returns {
+    success: Boolean;
     response: String;
+    answer: String;
     confidence: Decimal(3,2);
     queryId: UUID;
   };
@@ -51,15 +64,79 @@ service LegalDocumentService @(path: '/legal-documents') {
     feedback: String
   ) returns String;
 
+  action getDashboardStats() returns {
+    success: Boolean;
+    data: {
+      metrics: {
+        totalDocuments: Integer;
+        processedDocuments: Integer;
+        totalClauses: Integer;
+        totalQueries: Integer;
+        avgProcessingTime: Decimal(3,1);
+        successRate: Decimal(3,1);
+      };
+      recentDocuments: array of {
+        ID: UUID;
+        title: String;
+        fileName: String;
+        documentType: String;
+        status: String;
+        uploadedBy: String;
+        createdAt: String;
+        modifiedAt: String;
+      };
+      recentActivity: array of {
+        title: String;
+        documentType: String;
+        status: String;
+        modifiedAt: String;
+        confidence: Decimal(3,2);
+      };
+      processingStatus: array of {
+        status: String;
+        count: Integer;
+        percentage: Decimal(3,1);
+      };
+      clauseDistribution: array of {
+        clauseType: String;
+        clauseCount: Integer;
+        avgConfidence: Decimal(3,2);
+      };
+      queryPerformance: array of {
+        avgResponseTime: Decimal(3,1);
+        totalQueries: Integer;
+        successRate: Decimal(3,1);
+      };
+    };
+    timestamp: String;
+    error: String;
+  };
+
   action uploadDocument(
-    file: LargeBinary,
     fileName: String,
-    documentType: String,
-    sessionToken: String
+    fileContent: String,
+    mimeType: String,
+    analysisType: String
   ) returns {
     success: Boolean;
     documentId: UUID;
     message: String;
+    document: {
+      ID: UUID;
+      title: String;
+      fileName: String;
+      documentType: String;
+      extractedText: String;
+      status: String;
+    };
+    analysis: {
+      analysisType: String;
+      content: String;
+      confidence: Integer;
+      timestamp: String;
+    };
+    textLength: Integer;
+    error: String;
   };
 
   action generateSummary(
@@ -136,4 +213,200 @@ service LegalDocumentService @(path: '/legal-documents') {
     modelName: String,
     parameters: String
   ) returns String;
+
+  // Enterprise AI Service Actions
+  action performEnterpriseAnalysis(
+    documentText: String,
+    analysisType: String
+  ) returns {
+    success: Boolean;
+    analysis: {
+      success: Boolean;
+      analysisType: String;
+      timestamp: String;
+      results: array of {
+        type: String;
+        content: String;
+        confidence: Decimal;
+        riskLevel: String;
+      };
+      confidence: Integer;
+      processingTime: String;
+    };
+    metadata: {
+      wordCount: Integer;
+      characterCount: Integer;
+      estimatedReadingTime: String;
+      documentType: String;
+      language: String;
+      complexity: String;
+    };
+    modelInfo: {
+      name: String;
+      version: String;
+      performance: Decimal;
+      capabilities: array of String;
+      isActive: Boolean;
+    };
+    timestamp: String;
+  };
+
+  action askEnterpriseQuestion(
+    question: String,
+    documentText: String,
+    context: String
+  ) returns {
+    success: Boolean;
+    question: String;
+    answer: String;
+    confidence: Decimal;
+    sources: array of String;
+    timestamp: String;
+    modelInfo: {
+      name: String;
+      version: String;
+      performance: Decimal;
+      capabilities: array of String;
+      isActive: Boolean;
+    };
+  };
+
+  action performEnterpriseRiskAssessment(
+    documentText: String,
+    riskCategories: array of String
+  ) returns {
+    success: Boolean;
+    overallRiskLevel: String;
+    riskCategories: array of {
+      category: String;
+      level: String;
+      score: Decimal;
+      findings: array of String;
+    };
+    recommendations: array of String;
+    timestamp: String;
+    modelInfo: {
+      name: String;
+      version: String;
+      performance: Decimal;
+      capabilities: array of String;
+      isActive: Boolean;
+    };
+  };
+
+  action performEnterpriseComplianceCheck(
+    documentText: String,
+    regulations: array of String
+  ) returns {
+    success: Boolean;
+    overallCompliance: Decimal;
+    regulationResults: array of {
+      regulation: String;
+      compliant: Boolean;
+      score: Decimal;
+      findings: array of String;
+    };
+    violations: array of String;
+    recommendations: array of String;
+    timestamp: String;
+    modelInfo: {
+      name: String;
+      version: String;
+      performance: Decimal;
+      capabilities: array of String;
+      isActive: Boolean;
+    };
+  };
+
+  action getAIServiceStatus() returns {
+    success: Boolean;
+    status: {
+      aiAnalyzer: Boolean;
+      enterpriseAI: Boolean;
+      models: {
+        totalModels: Integer;
+        activeModels: Integer;
+        averagePerformance: Integer;
+        lastUpdated: String;
+      };
+      capabilities: array of String;
+      timestamp: String;
+    };
+  };
+
+  // Gen AI + RAG Service Actions
+  action analyzeWithGenAI(
+    documentText: String,
+    analysisType: String
+  ) returns {
+    success: Boolean;
+    analysisType: String;
+    analysis: {
+      content: String;
+      confidence: Decimal;
+      sections: array of {
+        title: String;
+        content: String;
+      };
+      keyPoints: array of String;
+    };
+    chunks: Integer;
+    timestamp: String;
+    model: String;
+    ragEnabled: Boolean;
+    serviceType: String;
+  };
+
+  action askQuestionWithRAG(
+    question: String,
+    documentText: String,
+    context: String
+  ) returns {
+    success: Boolean;
+    question: String;
+    answer: String;
+    confidence: Decimal;
+    sources: array of String;
+    relevantChunks: Integer;
+    timestamp: String;
+    model: String;
+    serviceType: String;
+  };
+
+  action assessRisksWithRAG(
+    documentText: String,
+    riskCategories: array of String
+  ) returns {
+    success: Boolean;
+    overallRiskLevel: String;
+    riskCategories: array of {
+      category: String;
+      level: String;
+      score: Decimal;
+      findings: array of String;
+    };
+    recommendations: array of String;
+    timestamp: String;
+    model: String;
+    serviceType: String;
+  };
+
+  action checkComplianceWithAI(
+    documentText: String,
+    regulations: array of String
+  ) returns {
+    success: Boolean;
+    overallCompliance: Decimal;
+    regulationResults: array of {
+      regulation: String;
+      compliant: Boolean;
+      score: Decimal;
+      findings: array of String;
+    };
+    violations: array of String;
+    recommendations: array of String;
+    timestamp: String;
+    model: String;
+    serviceType: String;
+  };
 }

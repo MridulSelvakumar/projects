@@ -1,0 +1,139 @@
+<mvc:View controllerName="project1.controller.AIAnalyzer"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:unified="sap.ui.unified">
+
+    <Page id="aiAnalyzerPage" title="AI Document Analyzer" showNavButton="false">
+        <content>
+            <VBox class="sapUiMediumMargin">
+
+                <!-- Header -->
+                <HBox alignItems="Center" justifyContent="SpaceBetween" class="sapUiMediumMarginBottom">
+                    <VBox>
+                        <Title text="AI Document Analyzer" level="H2"/>
+                        <Text text="Upload and analyze legal documents with Gemini AI" class="sapUiTinyMarginTop"/>
+                    </VBox>
+                    <Button text="Back to Dashboard" icon="sap-icon://nav-back" press="onNavigateToDashboard" type="Default"/>
+                </HBox>
+
+                <!-- Document Upload -->
+                <Panel headerText="Document Upload" class="sapUiMediumMarginBottom">
+                    <content>
+                        <VBox class="sapUiMediumMargin">
+                            <!-- File Upload Section -->
+                            <VBox class="sapUiTinyMarginBottom">
+                                <HBox alignItems="Center" class="sapUiTinyMarginBottom">
+                                    <core:Icon src="sap-icon://upload" class="sapUiTinyMarginEnd"/>
+                                    <Text text="Upload a document file (PDF, DOC, DOCX, TXT)"/>
+                                </HBox>
+                                <unified:FileUploader
+                                    id="fileUploader"
+                                    name="documentFile"
+                                    uploadUrl=""
+                                    placeholder="Choose file..."
+                                    fileType="pdf,doc,docx,txt"
+                                    maximumFileSize="10"
+                                    change="onFileChange"
+                                    class="sapUiTinyMarginBottom"/>
+                                <Button text="Extract Text from File" press="onExtractText" type="Emphasized" enabled="{aiModel>/hasFile}" class="sapUiTinyMarginEnd"/>
+                            </VBox>
+
+                            <!-- Text Area -->
+                            <VBox class="sapUiTinyMarginTop">
+                                <HBox alignItems="Center" class="sapUiTinyMarginBottom">
+                                    <core:Icon src="sap-icon://edit" class="sapUiTinyMarginEnd"/>
+                                    <Text text="Or paste/edit document text directly:"/>
+                                </HBox>
+                                <TextArea
+                                    id="documentTextArea"
+                                    value="{aiModel>/documentText}"
+                                    placeholder="Paste your legal document text here or upload a file above..."
+                                    rows="8"
+                                    liveChange="onDocumentTextChange"
+                                    class="sapUiTinyMarginBottom"/>
+                            </VBox>
+
+                            <!-- Action Buttons -->
+                            <HBox class="sapUiTinyMarginTop">
+                                <Button text="Use Sample Contract" press="onUseSampleDocument" type="Default" class="sapUiTinyMarginEnd"/>
+                                <Button text="Analyze with Gemini AI" press="onAnalyzeDocument" type="Accept" enabled="true"/>
+                            </HBox>
+
+                            <!-- Document Info -->
+                            <VBox visible="{aiModel>/hasDocument}" class="sapUiMediumMarginTop">
+                                <Text text="Document loaded: {aiModel>/documentInfo}" class="sapUiMediumText"/>
+                            </VBox>
+                        </VBox>
+                    </content>
+                </Panel>
+
+                <!-- Analysis Results -->
+                <Panel headerText="Gemini AI Analysis Results" visible="{aiModel>/hasAnalysis}" class="sapUiMediumMarginBottom">
+                    <content>
+                        <VBox class="sapUiMediumMargin">
+                            <!-- Analysis Actions -->
+                            <HBox justifyContent="End" class="sapUiMediumMarginBottom">
+                                <Button text="{i18n>downloadSimplifiedForm}"
+                                        icon="sap-icon://download"
+                                        type="Emphasized"
+                                        press="onDownloadSimplifiedForm"
+                                        class="sapUiTinyMarginEnd"/>
+                                <Button text="{i18n>downloadFullAnalysis}"
+                                        icon="sap-icon://document-text"
+                                        type="Default"
+                                        press="onDownloadFullAnalysis"/>
+                            </HBox>
+
+                            <!-- Analysis Content -->
+                            <Text text="{aiModel>/analysisResult}" class="sapUiMediumText"/>
+                        </VBox>
+                    </content>
+                </Panel>
+
+                <!-- Q&A Section -->
+                <Panel headerText="Ask Questions" class="sapUiMediumMarginBottom">
+                    <content>
+                        <VBox class="sapUiMediumMargin">
+                            <TextArea
+                                value="{aiModel>/currentQuestion}"
+                                placeholder="What are the payment terms? Who are the parties involved? What are the key obligations?"
+                                rows="3"
+                                class="sapUiTinyMarginBottom"/>
+
+                            <HBox class="sapUiTinyMarginBottom">
+                                <Button text="Ask Gemini AI" press="onAskQuestion" type="Emphasized" enabled="true" class="sapUiTinyMarginEnd"/>
+                                <Button text="Clear" press="onClearQuestion" type="Transparent"/>
+                            </HBox>
+
+                            <!-- Q&A Results -->
+                            <VBox visible="{aiModel>/hasQAResults}" class="sapUiMediumMarginTop">
+                                <List items="{aiModel>/qaResults}">
+                                    <CustomListItem>
+                                        <content>
+                                            <VBox class="sapUiMediumMargin">
+                                                <Text text="Q: {aiModel>question}" class="sapUiMediumText sapUiTinyMarginBottom"/>
+                                                <Text text="A: {aiModel>answer}" class="sapUiMediumText"/>
+                                            </VBox>
+                                        </content>
+                                    </CustomListItem>
+                                </List>
+                            </VBox>
+                        </VBox>
+                    </content>
+                </Panel>
+
+                <!-- Processing Status -->
+                <Panel headerText="Processing Status" visible="{aiModel>/isProcessing}">
+                    <content>
+                        <VBox class="sapUiMediumMargin" alignItems="Center">
+                            <BusyIndicator size="2rem" class="sapUiTinyMarginBottom"/>
+                            <Text text="{aiModel>/processingMessage}" class="sapUiMediumText"/>
+                        </VBox>
+                    </content>
+                </Panel>
+
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

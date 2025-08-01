@@ -1,0 +1,96 @@
+<mvc:View
+    controllerName="project1.controller.Documents"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    displayBlock="true"
+    xmlns="sap.m">
+
+    <Page id="documentsPage" title="Document Management" showNavButton="true" navButtonPress="onNavBack">
+        <content>
+            <VBox class="sapUiMediumMargin">
+                <Panel headerText="Document Library" class="sapUiResponsiveMargin">
+                    <content>
+                        <VBox class="sapUiSmallMargin">
+                            <Title text="Manage Your Legal Documents" level="H3"/>
+                            <Text text="View, search, and manage all uploaded documents"/>
+                            <Button text="Upload New Document" type="Emphasized" press="onUploadDocument" icon="sap-icon://add-document"/>
+                        </VBox>
+                    </content>
+                </Panel>
+
+                <!-- Documents List -->
+                <Panel headerText="Documents ({documents>/totalCount})" class="sapUiResponsiveMargin">
+                    <headerToolbar>
+                        <Toolbar>
+                            <Title text="Documents ({documents>/totalCount})" level="H4"/>
+                            <ToolbarSpacer/>
+                            <Button text="Refresh" icon="sap-icon://refresh" press="onRefreshDocuments"/>
+                        </Toolbar>
+                    </headerToolbar>
+                    <content>
+                        <VBox class="sapUiSmallMargin">
+                            <!-- Loading Indicator -->
+                            <BusyIndicator visible="{documents>/isLoading}" class="sapUiMediumMargin"/>
+
+                            <!-- Documents Table -->
+                            <Table items="{documents>/documents}" visible="{= !${documents>/isLoading}}" class="sapUiResponsiveMargin">
+                                <headerToolbar>
+                                    <Toolbar>
+                                        <Label text="Last Updated: {documents>/lastUpdated}"/>
+                                    </Toolbar>
+                                </headerToolbar>
+                                <columns>
+                                    <Column>
+                                        <Text text="Document"/>
+                                    </Column>
+                                    <Column>
+                                        <Text text="Type"/>
+                                    </Column>
+                                    <Column>
+                                        <Text text="Status"/>
+                                    </Column>
+                                    <Column>
+                                        <Text text="Date"/>
+                                    </Column>
+                                    <Column>
+                                        <Text text="Actions"/>
+                                    </Column>
+                                </columns>
+                                <items>
+                                    <ColumnListItem press="onDocumentPress">
+                                        <cells>
+                                            <VBox>
+                                                <Text text="{documents>title}" class="sapUiMediumText"/>
+                                                <Text text="{documents>fileName}" class="sapUiTinyText"/>
+                                            </VBox>
+                                            <Text text="{documents>documentType}"/>
+                                            <ObjectStatus
+                                                text="{documents>status}"
+                                                state="{path: 'documents>status', formatter: '.formatStatus'}"
+                                                icon="{path: 'documents>status', formatter: '.getStatusIcon'}"/>
+                                            <Text text="{path: 'documents>createdAt', formatter: '.formatDate'}"/>
+                                            <Button
+                                                icon="sap-icon://delete"
+                                                type="Transparent"
+                                                press="onDeleteDocument"
+                                                tooltip="Delete Document"/>
+                                        </cells>
+                                    </ColumnListItem>
+                                </items>
+                                <noData>
+                                    <VBox alignItems="Center" class="sapUiMediumMargin">
+                                        <core:Icon src="sap-icon://document" size="3rem" color="Neutral"/>
+                                        <Text text="No documents found" class="sapUiMediumMarginTop"/>
+                                        <Text text="Upload a document using the AI Analyzer to get started"/>
+                                        <Button text="Go to AI Analyzer" type="Emphasized" press="onUploadDocument" class="sapUiSmallMarginTop"/>
+                                    </VBox>
+                                </noData>
+                            </Table>
+                        </VBox>
+                    </content>
+                </Panel>
+
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>
